@@ -2,7 +2,7 @@ import sys
 
 def set_deb_control(version , arch):
     file_name  = "./package/debian/DEBIAN/control"
-    template = "Package: tibber\n"
+    template = "Package: fh-tibber\n"
     template+= "Version: "+version+"\n"
     template+= "Section: non-free/misc\n"
     template+= "Priority: optional\n"

@@ -7,15 +7,15 @@ fi
 
 if [ "$1" = "remove" ]; then
   if [ -x "/usr/bin/deb-systemd-helper" ]; then
-    deb-systemd-helper mask tibber.service >/dev/null
+    deb-systemd-helper mask fh-tibber.service >/dev/null
   fi
 fi
 
 if [ "$1" = "purge" ]; then
-  rm -rf /var/lib/futurehome/tibber/data
+  rm -rf /var/lib/futurehome/fh-tibber/data
   
   if [ -x "/usr/bin/deb-systemd-helper" ]; then
-    deb-systemd-helper purge tibber.service >/dev/null
-    deb-systemd-helper unmask tibber.service >/dev/null
+    deb-systemd-helper purge fh-tibber.service >/dev/null
+    deb-systemd-helper unmask fh-tibber.service >/dev/null
   fi
 fi

@@ -9,7 +9,7 @@ import (
 
 	"github.com/futurehomeno/fimpgo"
 	log "github.com/sirupsen/logrus"
-	"github.com/tskaard/tibber/model"
+	"github.com/tskaard/fh-tibber/model"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -66,7 +66,7 @@ func main() {
 	}
 
 	msg := fimpgo.NewFloatMessage("evt.sensor.report", "temp_sensor", float64(35.5), nil, nil, nil)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeDevice, ResourceName: "tibber", ResourceAddress: "1", ServiceName: "temp_sensor", ServiceAddress: "300"}
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeDevice, ResourceName: "fh-tibber", ResourceAddress: "1", ServiceName: "temp_sensor", ServiceAddress: "300"}
 	mqtt.Publish(&adr, msg)
 
 	mqtt.Stop()

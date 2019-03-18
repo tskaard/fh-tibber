@@ -1,8 +1,7 @@
-Package: things_plex_service_template
-Version: 0.10.6
-Replaces: things_plex_service_template
+Package: fh-tibber
+Version: 0.0.1~~pre1
 Section: non-free/misc
 Priority: optional
 Architecture: armhf
-Maintainer: Aleksandrs Livincovs <aleksandrs.livincovs@gmail.com>
-Description: Thingplex things_plex_service_template is IoT rule and flow engine.
+Maintainer: Tor Erik Skårdal <skardal@me.com>
+Description: Get data from Tibber.
