@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"time"
 
 	"github.com/futurehomeno/fimpgo"
 	log "github.com/sirupsen/logrus"
+	"github.com/tskaard/fh-tibber/handler"
 	"github.com/tskaard/fh-tibber/model"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
@@ -64,11 +64,16 @@ func main() {
 	} else {
 		log.Info("--------------Connected----------------")
 	}
+	fimpHandler := handler.NewFimpTibberHandler(mqtt, configs.StateDir)
+	fimpHandler.Start()
+	log.Info("--------------Started handler----------")
 
-	msg := fimpgo.NewFloatMessage("evt.sensor.report", "temp_sensor", float64(35.5), nil, nil, nil)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeDevice, ResourceName: "fh-tibber", ResourceAddress: "1", ServiceName: "temp_sensor", ServiceAddress: "300"}
-	mqtt.Publish(&adr, msg)
+	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:fh-tibber/ad:1")
+	mqtt.Subscribe("pt:j1/mt:cmd/rt:dev/rn:fh-tibber/ad:1/#")
+	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:ad/rn:fh-tibber/ad:1")
+	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:fh-tibber/ad:1/#")
+
+	select {}
 
 	mqtt.Stop()
-	time.Sleep(10 * time.Second)
 }
