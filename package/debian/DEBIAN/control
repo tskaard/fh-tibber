@@ -1,7 +1,7 @@
 Package: fh-tibber
-Version: 0.0.1~~pre1
+Version: 0.0.3
 Section: non-free/misc
 Priority: optional
 Architecture: armhf
 Maintainer: Tor Erik Skårdal <skardal@me.com>
-Description: Get data from Tibber.
+Description: Meter data from Tibber to futurehome.

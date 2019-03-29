@@ -1,4 +1,4 @@
-version="0.0.1"
+version="0.0.3"
 version_file=VERSION
 working_dir=$(shell pwd)
 arch="armhf"
@@ -29,6 +29,7 @@ package-tar:
 package-deb-doc:
 	@echo "Packaging application as debian package"
 	chmod a+x package/debian/DEBIAN/*
+	mkdir -p package/debian/var/log/fh-tibber/sensibo package/debian/var/lib/futurehome/fh-tibber/data
 	cp ./src/fh-tibber package/debian/usr/bin/fh-tibber
 	cp VERSION package/debian/var/lib/futurehome/fh-tibber
 	docker run --rm -v ${working_dir}:/build -w /build --name debuild debian dpkg-deb --build package/debian

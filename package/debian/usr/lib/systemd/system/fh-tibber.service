@@ -1,0 +1,14 @@
+[Unit]
+Description=Tibber Pulse app
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fh-tibber -c /etc/futurehome/fh-tibber/config.json
+User=fh-tibber
+WorkingDirectory=/var/lib/futurehome/fh-tibber
+Restart=always
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target
