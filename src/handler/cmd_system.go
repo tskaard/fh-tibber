@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/futurehomeno/fimpgo"
 	log "github.com/sirupsen/logrus"
-	tibberws "github.com/tskaard/tibberws-golang"
+	tibber "github.com/tskaard/tibber-golang"
 )
 
 func (t *FimpTibberHandler) systemSync(oldMsg *fimpgo.Message) {
@@ -26,11 +26,10 @@ func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
 	}
 	for _, home := range t.state.Homes {
 		t.sendExclusionReport(home.ID, msg.Payload)
-		if wsClient, ok := t.wsClients[home.ID]; ok {
-			wsClient.Stop()
-			delete(t.wsClients, home.ID)
+		if stream, ok := t.streams[home.ID]; ok {
+			stream.Stop()
+			delete(t.streams, home.ID)
 		}
-		//t.wsClients[home.ID] = tibberWs
 		_, err := t.tibber.SendPushNotification("Futurehome", home.AppNickname+" is now disconnected from Futurehome")
 		if err != nil {
 			log.Debug("Push failed", err)
@@ -94,9 +93,9 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 		if home.Features.RealTimeConsumptionEnabled {
 			t.state.Homes = append(t.state.Homes, home)
 			t.sendInclusionReport(home, oldMsg.Payload)
-			tibberWs := tibberws.NewTibberWsClient(home.ID, t.tibber.Token)
-			tibberWs.StartSubscription(t.tibberMsgCh)
-			t.wsClients[home.ID] = tibberWs
+			stream := tibber.NewStream(home.ID, t.tibber.Token)
+			stream.StartSubscription(t.tibberMsgCh)
+			t.streams[home.ID] = stream
 			_, err := t.tibber.SendPushNotification("Futurehome", home.AppNickname+" is now connected to Futurehome 🎉")
 			if err != nil {
 				log.Debug("Push failed", err)

@@ -12,10 +12,10 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.2.0 // indirect
 	github.com/nanobox-io/golang-scribble v0.0.0-20190309225732-aa3e7c118975
-	github.com/sirupsen/logrus v1.4.0
+	github.com/sirupsen/logrus v1.4.1
 	github.com/stretchr/testify v1.3.0 // indirect
-	github.com/tskaard/tibber-golang v0.0.0-20190326203933-7ec0f35ff4f3
-	github.com/tskaard/tibberws-golang v0.0.0-20190328194111-fc096d11f58a
+	github.com/tskaard/tibber-golang v0.0.3
+	github.com/tskaard/tibberws-golang v0.0.0-20190329222857-df3896b248fd
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c // indirect
 	golang.org/x/net v0.0.0-20190327214358-63eda1eb0650 // indirect
 	golang.org/x/sys v0.0.0-20190322080309-f49334f85ddc // indirect

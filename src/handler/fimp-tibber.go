@@ -6,27 +6,26 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/model"
 	tibber "github.com/tskaard/tibber-golang"
-	tibberws "github.com/tskaard/tibberws-golang"
 )
 
-// FimpTibber structure
+// FimpTibberHandler structure
 type FimpTibberHandler struct {
 	inboundMsgCh fimpgo.MessageCh
 	mqt          *fimpgo.MqttTransport
 	db           *scribble.Driver
 	state        model.State
-	tibber       *tibber.TibberClient
-	wsClients    map[string]*tibberws.TibberWsClient
-	tibberMsgCh  chan *tibberws.TibberMsg
+	tibber       *tibber.Client
+	streams      map[string]*tibber.Stream
+	tibberMsgCh  tibber.MsgChan
 }
 
 // NewFimpTibberHandler construct new handler
 func NewFimpTibberHandler(transport *fimpgo.MqttTransport, stateFile string) *FimpTibberHandler {
 	t := &FimpTibberHandler{inboundMsgCh: make(fimpgo.MessageCh, 5), mqt: transport}
 	t.mqt.RegisterChannel("ch1", t.inboundMsgCh)
-	t.tibber = tibber.NewTibberClient("")
-	t.tibberMsgCh = make(chan *tibberws.TibberMsg)
-	t.wsClients = make(map[string]*tibberws.TibberWsClient)
+	t.tibber = tibber.NewClient("")
+	t.streams = make(map[string]*tibber.Stream)
+	t.tibberMsgCh = make(tibber.MsgChan)
 	t.db, _ = scribble.New(stateFile, nil)
 	t.state = model.State{}
 	return t
@@ -45,9 +44,9 @@ func (t *FimpTibberHandler) Start() error {
 	t.tibber.Token = t.state.AccessToken
 	if t.state.Connected {
 		for _, home := range t.state.Homes {
-			tibberWs := tibberws.NewTibberWsClient(home.ID, t.tibber.Token)
-			tibberWs.StartSubscription(t.tibberMsgCh)
-			t.wsClients[home.ID] = tibberWs
+			stream := tibber.NewStream(home.ID, t.tibber.Token)
+			stream.StartSubscription(t.tibberMsgCh)
+			t.streams[home.ID] = stream
 		}
 	}
 	var errr error
@@ -60,7 +59,7 @@ func (t *FimpTibberHandler) Start() error {
 		}
 	}(t.inboundMsgCh)
 
-	go func(msgChan chan *tibberws.TibberMsg) {
+	go func(msgChan tibber.MsgChan) {
 		for {
 			select {
 			case msg := <-msgChan:
@@ -71,7 +70,7 @@ func (t *FimpTibberHandler) Start() error {
 	return errr
 }
 
-func (t *FimpTibberHandler) routeTibberMessage(msg *tibberws.TibberMsg) {
+func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 	//log.Debug("New tibber msg")
 	for _, home := range t.state.Homes {
 		if home.ID == msg.HomeID {
