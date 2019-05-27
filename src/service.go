@@ -68,10 +68,10 @@ func main() {
 	fimpHandler.Start()
 	log.Info("--------------Started handler----------")
 
-	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:fh-tibber/ad:1")
-	mqtt.Subscribe("pt:j1/mt:cmd/rt:dev/rn:fh-tibber/ad:1/#")
-	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:ad/rn:fh-tibber/ad:1")
-	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:fh-tibber/ad:1/#")
+	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
+	mqtt.Subscribe("pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
+	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
+	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
 
 	select {}
 

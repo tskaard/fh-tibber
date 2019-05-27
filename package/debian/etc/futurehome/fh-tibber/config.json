@@ -1,10 +1,10 @@
 {
   "instance_address":"1",
   "mqtt_server_uri":"tcp://localhost:1883",
-  "mqtt_client_id_prefix":"fh-tibber",
+  "mqtt_client_id_prefix":"tibber",
   "mqtt_server_username":"",
   "mqtt_server_password":"",
-  "log_file": "/var/log/futurehome/fh-tibber/fh-tibber.log",
+  "log_file": "/var/log/futurehome/tibber/tibber.log",
   "log_level": "debug",
   "log_format": "text"
 }

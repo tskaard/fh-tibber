@@ -4,28 +4,28 @@ set -e
 if [ "$1" = "configure" ]
 then
   groupadd -r futurehome || true
-  groupadd -r fh-tibber || true
+  groupadd -r tibber || true
 
-  useradd -r -N -M -d / -s /bin/false -g fh-tibber fh-tibber || true
+  useradd -r -N -M -d / -s /bin/false -g tibber tibber || true
 
-  chown -R fh-tibber:futurehome /var/log/futurehome/fh-tibber/ || true
-  chown -R fh-tibber:fh-tibber /var/lib/futurehome/fh-tibber/ || true
+  chown -R tibber:futurehome /var/log/futurehome/tibber/ || true
+  chown -R tibber:tibber /var/lib/futurehome/tibber/ || true
 fi
 
-deb-systemd-helper unmask fh-tibber.service >/dev/null || true
+deb-systemd-helper unmask tibber.service >/dev/null || true
 
-if deb-systemd-helper --quiet was-enabled fh-tibber.service; then
-  deb-systemd-helper enable fh-tibber.service >/dev/null || true
+if deb-systemd-helper --quiet was-enabled tibber.service; then
+  deb-systemd-helper enable tibber.service >/dev/null || true
 else
-  deb-systemd-helper update-state fh-tibber.service >/dev/null || true
+  deb-systemd-helper update-state tibber.service >/dev/null || true
 fi
 
 if [ -d /run/systemd/system ]; then
   systemctl --system daemon-reload >/dev/null || true
 
   if [ -n "$2" ]; then
-    deb-systemd-invoke try-restart fh-tibber.service >/dev/null || true
+    deb-systemd-invoke try-restart tibber.service >/dev/null || true
   else
-    deb-systemd-invoke start fh-tibber.service >/dev/null || true
+    deb-systemd-invoke start tibber.service >/dev/null || true
   fi
 fi

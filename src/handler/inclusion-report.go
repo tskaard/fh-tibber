@@ -26,7 +26,7 @@ func createSensorService(addr string, service string, supUnits []string, alias s
 	props := make(map[string]interface{})
 	props["sup_units"] = supUnits
 	sensorService := fimptype.Service{
-		Address:    "/rt:dev/rn:fh-tibber/ad:1/sv:" + service + "/ad:" + addr,
+		Address:    "/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr,
 		Name:       service,
 		Groups:     []string{"ch_0"},
 		Alias:      alias,
@@ -54,8 +54,8 @@ func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo
 		DeviceId:       home.MeteringPointData.ConsumptionEan,
 	}
 
-	msg := fimpgo.NewMessage("evt.thing.inclusion_report", "fh-tibber", "object", incReort, nil, nil, oldMsg)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "fh-tibber", ResourceAddress: "1"}
+	msg := fimpgo.NewMessage("evt.thing.inclusion_report", "tibber", "object", incReort, nil, nil, oldMsg)
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
 	t.mqt.Publish(&adr, msg)
 	log.Debug("Inclusion report sent")
 }

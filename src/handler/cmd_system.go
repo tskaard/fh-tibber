@@ -48,15 +48,15 @@ func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message)
 	// request api_key
 	val := map[string]string{
 		"address": "api.tibber.com",
-		"id":      "fh-tibber",
+		"id":      "tibber",
 	}
 	if t.state.Connected {
 		val["security_key"] = t.state.AccessToken
 	} else {
 		val["security_key"] = "api_key"
 	}
-	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report", "fh-tibber", val, nil, nil, oldMsg.Payload)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "fh-tibber", ResourceAddress: "1"}
+	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report", "tibber", val, nil, nil, oldMsg.Payload)
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
 	t.mqt.Publish(&adr, msg)
 	log.Debug("Connect params message sent")
 }
