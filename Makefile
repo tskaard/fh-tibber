@@ -1,10 +1,11 @@
-version="0.0.6"
+version="0.0.7"
 version_file=VERSION
 working_dir=$(shell pwd)
 arch="armhf"
 
 clean:
-	-rm tpflow
+	-rm ./src/tibber
+	find . -name '.DS_Store' -type f -delete
 
 build-go:
 	cd ./src;go build -o tibber service.go;cd ../
