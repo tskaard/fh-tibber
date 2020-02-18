@@ -1,7 +1,0 @@
-Package: tibber
-Version: 0.0.6
-Section: non-free/misc
-Priority: optional
-Architecture: armhf
-Maintainer: Tor Erik Skårdal <skardal@me.com>
-Description: Meter data from Tibber to futurehome.

@@ -1,5 +1,14 @@
 .DS_Store
-package/build
 src/testdata
+src/tibber
 *.exe
-.vscode/*
+
+# Debian packaging
+VERSION
+control
+*.deb
+package/build
+
+# IDE
+.idea
+.vscode
