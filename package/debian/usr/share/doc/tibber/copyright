@@ -1,0 +1,150 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: tibber
+
+Files: *
+Copyright: 2014 Future Home AS. All rights reserved.
+License: Future Home EULA
+ END USER LICENSE AGREEMENT
+ FUTURE HOME SMART HOME SOFTWARE PACKAGES
+ FUTURE HOME AS
+ REVISED: 9 July 2014
+ .
+ THIS IS A LEGAL AGREEMENT ("AGREEMENT") BETWEEN FUTURE HOME AS ("FUTURE HOME",
+ "WE", "OUR" AND "US") AND YOU. YOU AGREE TO BE BOUND BY THE TERMS AND
+ CONDITIONS OF THIS AGREEMENT IF YOU: (a) INSTALL OR USE ANY PART OF FUTURE
+ HOME SOFTWARE PACKAGES AND RELATED DOCUMENTATION (COLLECTIVELY, THE
+ "SOFTWARE"), OR (b)  THE ACCEPTANCE BUTTON ON THE ELECTRONIC VERSION OF THIS
+ AGREEMENT. PLEASE READ THIS AGREEMENT CAREFULLY. YOUR USE OF THIS SOFTWARE IS
+ SUBJECT TO THE TERMS OF THIS AGREEMENT AND THE SOFTWARE PRIVACY POLICY AT
+ FUTUREHOME.NO/PRIVACY-POLICY, WHICH SHALL FORM PART OF THIS AGREEMENT. THE
+ SOFTWARE HAS THE CAPABILITY TO COLLECT CERTAIN DATA ABOUT YOUR USE OF THE
+ SOFTWARE AND THE CONTENT THAT YOU CONSUME. PLEASE REVIEW SECTION 6 OF THIS
+ AGREEMENT FOR MORE INFORMATION ABOUT THE KIND OF INFORMATION WE COLLECT.
+ .
+ AT OUR DISCRETION, WE MAY MAKE CHANGES TO THIS AGREEMENT, WHICH WILL BE
+ DISPLAYED ON THE FUTURE HOME WEB SITE. IF WE MAKE EXTENSIVE OR MATERIAL
+ CHANGES, WE MAY SEND AN EMAIL TO YOU NOTIFYING YOU OF SUCH CHANGES. BY
+ CONTINUING TO USE THE SOFTWARE, YOU WILL BE DEEMED TO HAVE ACCEPTED THE
+ CHANGES.
+ .
+ DESCRIPTION OF SOFTWARE. The Software consists of several packages which, when
+ used with Future Home Hardware enables Future Home Smart House functinality.
+ .
+ GRANT OF LICENSE. Subject to your compliance with this Agreement, we hereby
+ grant you a limited, non-exclusive license to use the Software upon the terms
+ and conditions set forth in this Agreement. We reserve all rights in and to
+ the Software not otherwise granted in this Agreement.
+ .
+ RESTRICTIONS ON USE. You may not: (a) distribute, share, sublicense, lend,
+ lease or otherwise make the Software available to any third party (on the
+ Internet, an information network or tangible media, by broadcast or in any
+ other manner) or exploit the Software commercially, (b) modify, adapt, create
+ derivative works from or translate any part of the Software, (c) reverse
+ engineer, decompile or disassemble the Software or otherwise attempt to obtain
+ its source code, (d) remove or alter any copyright, trademark or other
+ proprietary notice contained in the Software, (e) use the Software in an
+ unlawful manner or for illegal activities, or (f) use the Software in any
+ manner not set forth in this Agreement or in the Software's documentation.
+ .
+ USE OF CONTENT. You may not install this software on devices not authorized
+ Future Home. You may not use the Software for any purpose that: (a) infringes
+ the copyright, trademark, patent, trade secret, right of publicity or any
+ other right of a third party, (b) is or may be libelous, defamatory or
+ slanderous, or (c) any other use that is illegal in nature. Future Home is not
+ in any way responsible for any content used in conjunction with the Software.
+ .
+ OWNERSHIP OF SOFTWARE. The Software contains copyrighted material, trademarks
+ and other intellectual property that is provided by and belongs to third
+ parties ("Third Party Providers") and Future Home affiliates. Future Home and
+ the Third Party Providers own and will retain all title, ownership rights and
+ intellectual property rights in and to the Software. To the extent necessary,
+ Future Home affiliates shall be entitled to rely on and enforce this Agreement
+ to protect their intellectual property rights.
+ .
+ PRIVACY AND COLLECTION OF INFORMATION. The Software is designed to collect and
+ use certain information from your computer and communicate this information
+ via the Internet to our servers. We can use this information to improve the
+ function of the Software, to provide you with updates, to provide new features
+ and products via the Software that you might enjoy.
+ .
+ For a full explanation of our practices and policies in relation to the
+ collection, treatment and disclosure of information in relation to the
+ Software, see FH Privacy Policy. Our policy is not to disclose any information
+ collected via the Software to third parties without your express permission.
+ .
+ TERMINATION. Your right to use the Software will automatically terminate if
+ you fail to comply with any provision of this Agreement. If this Agreement is
+ terminated you must: (a) cease all use of the Software, (b) destroy the
+ original and all copies of the Software, and (c) permanently delete all copies
+ of the Software from the computer on which it has been installed. Information
+ collected from your use of the Software following termination of this
+ Agreement may be used by us after such termination. We reserve our rights to
+ bring proceedings against you for unauthorized use of the Software.
+ .
+ DISCLAIMER OF WARRANTIES. EXCEPT FOR THE RIGHT OF REPAIR OR REPLACEMENT
+ REFERRED TO IN SECTION 9 BELOW, THE SOFTWARE IS PROVIDED "AS IS” AND ON AN “AS
+ AVAILABLE” BASIS. TO THE FULL EXTENT PERMITTED BY APPLICABLE LOCAL LAW, FUTURE
+ HOME AND THE THIRD-PARTY PROVIDERS DISCLAIM ALL OTHER WARRANTIES,
+ REPRESENTATIONS AND CONDITIONS, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED
+ TO, THE IMPLIED WARRANTIES, REPRESENTATIONS AND CONDITIONS OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. NO ORAL OR WRITTEN
+ INFORMATION OR ADVICE GIVEN BY FUTURE HOME OR A FUTURE HOME AUTHORIZED
+ REPRESENTATIVE SHALL CREATE A WARRANTY. WITHOUT LIMITION OF THE FOREGOING,
+ FUTURE HOME AND THE THIRD-PARTY PROVIDERS DO NOT WARRANT THAT: (a) THE
+ SOFTWARE WILL BE ERROR-FREE, (b) YOUR USE OF THE SOFTWARE WILL BE
+ UNINTERRUPTED OR ERROR-FREE, (c) THE SOFTWARE WILL MEET YOUR REQUIREMENTS, OR
+ (d) THE SOFTWARE WILL OPERATE WITH THE HARDWARE OR SOFTWARE CONFIGURATION YOU
+ CHOOSE.
+ .
+ LIMITATIONS ON LIABILITY. IN NO EVENT WILL FUTURE HOME'S, FUTURE HOME'S
+ AFFILIATES OR THE THIRD-PARTY PROVIDERS' LIABILITY TO YOU OR ANY THIRD-PARTY
+ FOR ANY TOTAL FAILURE OF THE SOFTWARE EXCEED REPAIR OR REPLACEMENT OF THE
+ SOFTWARE (AT FUTURE HOME’S ELECTION).
+ .
+ EXCLUSION OF REMEDIES. WITHOUT LIMITING ANY OF THE DISCLAIMERS OR LIMITATIONS
+ SET FORTH IN PARAGRAPHS 8 AND 9, ABOVE, IN NO EVENT WILL FUTURE HOME, FUTURE
+ HOME'S AFFILIATES OR THE THIRD-PARTY PROVIDERS BE LIABLE TO YOU OR ANYONE ELSE
+ FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES OF
+ ANY KIND ARISING OUT OF YOUR USE OR INABILITY TO USE THE SOFTWARE (INCLUDING,
+ WITHOUT LIMITATION, LOSS OF PROFITS, REVENUE, USE OF SOFTWARE OR ANY
+ ASSOCIATED HARDWARE OR SOFTWARE, DATA OR GOODWILL) OR FOR ANY OTHER LIABILITY
+ OF ANY KIND, HOWEVER ARISING, WHETHER CAUSED BY TORT (INCLUDING NEGLIGENCE),
+ BREACH OF CONTRACT OR OTHERWISE, EVEN IF SUCH LIABILITY IS FORESEEABLE OR SUCH
+ PARTIES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ .
+ YOUR SPECIFIC RIGHTS. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF DAMAGES
+ OR LIMITATIONS OF LIABILITY, SO THE ABOVE EXCLUSIONS OR LIMITATIONS MAY NOT
+ APPLY TO YOU. YOUR SPECIFIC RIGHTS MAY VARY FROM JURISDICTION TO JURISDICTION.
+ THIS CLAUSE DOES NOT AFFECT OUR LIABILITY FOR DEATH OR PERSONAL INJURY ARISING
+ FROM OUR NEGLIGENCE OR ANY LIABILITY FOR FRAUDULENT MISREPRESENTATION.
+ .
+ EXPORT RESTRICTIONS. You agree that you will comply with all applicable export
+ laws, restrictions and regulations of the Norwegian Ministry of Trade and
+ Industry, the Norwegian Ministry of Finance and any other Norwegian or foreign
+ agency or authority. You agree not to download, export or re-export, or allow
+ the export or re-export of the Software in violation of any such law.
+ .
+ UPDATES, PATCHES AND FIXES. We may from time to time make available to you
+ updates, patches or fixes for the Software as explained in Section 3, subject
+ to this Agreement. In our sole discretion, we may make release of such
+ upgrades, patches or fixes to you conditional upon your acceptance of another
+ EULA or other execution of a separate agreement. If you elect to install
+ updates, patches or fixes, your use of the same will be subject to the
+ applicable license and the terms and conditions of this Agreement.
+ .
+ MISCELLANEOUS. This Agreement will be binding upon and inure to the benefit of
+ Future Home and its affiliates and you, and our respective successors and
+ permitted assigns. If any provision of this Agreement is determined to be
+ invalid or unenforceable, such determination will not affect the validity or
+ enforceability of any other provision of this Agreement. Any waiver of any
+ breach or failure to enforce any provision of this Agreement will not be
+ deemed a future waiver of such term or a waiver of any other provision. Any
+ waiver, amendment or modification of any provision of this Agreement will be
+ effective only if it is in writing and signed by Future Home and you. This
+ Agreement shall be governed by the Norwegian laws. Any action arising out of
+ or relating to this Agreement may be brought exclusively in the appropriate
+ state or federal court in Stavanger, Norway, and Future Home and you
+ irrevocably consent to the jurisdiction of such courts and venue in Rogaland
+ County, Norway. This Agreement constitutes the entire agreement between Future
+ Home and you with respect to the subject matter of this Agreement. Sections 8
+ through 11, 14 and 15 will survive the termination of this Agreement.

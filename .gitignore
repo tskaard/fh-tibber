@@ -1,6 +1,6 @@
 .DS_Store
 src/testdata
-src/tibber
+tibber
 *.exe
 
 # Debian packaging
