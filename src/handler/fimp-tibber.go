@@ -21,17 +21,20 @@ type FimpTibberHandler struct {
 
 // NewFimpTibberHandler construct new handler
 func NewFimpTibberHandler(transport *fimpgo.MqttTransport, stateFile string) *FimpTibberHandler {
-	t := &FimpTibberHandler{inboundMsgCh: make(fimpgo.MessageCh, 5), mqt: transport}
-	t.mqt.RegisterChannel("ch1", t.inboundMsgCh)
-	t.tibber = tibber.NewClient("")
-	t.streams = make(map[string]*tibber.Stream)
-	t.tibberMsgCh = make(tibber.MsgChan)
+	t := &FimpTibberHandler{
+		inboundMsgCh: make(fimpgo.MessageCh, 5),
+		mqt:          transport,
+		tibber:       tibber.NewClient(""),
+		streams:      make(map[string]*tibber.Stream),
+		tibberMsgCh:  make(tibber.MsgChan),
+		state:        model.State{},
+	}
 	t.db, _ = scribble.New(stateFile, nil)
-	t.state = model.State{}
+	t.mqt.RegisterChannel("ch1", t.inboundMsgCh)
 	return t
 }
 
-// Start start handler
+// Start handler
 func (t *FimpTibberHandler) Start() error {
 	if err := t.db.Read("data", "state", &t.state); err != nil {
 		log.Info("Error loading state from file: ", err)

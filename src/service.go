@@ -58,6 +58,7 @@ func main() {
 	log.Info("--------------Starting Tibber----------------")
 
 	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
+	defer mqtt.Stop()
 	err = mqtt.Start()
 	if err != nil {
 		log.Error("Can't connect to broker. Error:", err.Error())
@@ -74,6 +75,4 @@ func main() {
 	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
 
 	select {}
-
-	mqtt.Stop()
 }
