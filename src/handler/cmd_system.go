@@ -15,13 +15,14 @@ func (t *FimpTibberHandler) systemSync(oldMsg *fimpgo.Message) {
 	log.Info("System synced")
 }
 
-func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
+func (t *FimpTibberHandler) systemDisconnect(oldMsg *fimpgo.Message) {
 	if !t.state.Connected {
 		log.Error("Ad is not connected, no devices to exclude")
+		t.sendDisconnectReport("error", "Adapter is not connected", oldMsg.Payload)
 		return
 	}
 
-	t.sendExclusionReport(t.state.Home.ID, msg.Payload)
+	t.sendExclusionReport(t.state.Home.ID, oldMsg.Payload)
 	if stream, ok := t.streams[t.state.Home.ID]; ok {
 		stream.Stop()
 		delete(t.streams, t.state.Home.ID)
@@ -35,7 +36,10 @@ func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
 	t.state.Home = tibber.Home{}
 	if err := t.db.Write("data", "state", t.state); err != nil {
 		log.Error("Did not manage to write to file: ", err)
+		t.sendDisconnectReport("error", err.Error(), oldMsg.Payload)
+		return
 	}
+	t.sendDisconnectReport("ok", "", oldMsg.Payload)
 }
 
 func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message) {
@@ -181,5 +185,4 @@ func (t *FimpTibberHandler) thingDelete(msg *fimpgo.Message) {
 	} else {
 		t.sendErrorReport("NOT_FOUND", msg.Payload)
 	}
-
 }

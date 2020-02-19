@@ -34,3 +34,13 @@ func (t *FimpTibberHandler) sendConnectReport(status string, err string, oldMsg 
 		log.WithError(err).Error("Could not publish MQTT message")
 	}
 }
+
+func (t *FimpTibberHandler) sendDisconnectReport(status string, err string, oldMsg *fimpgo.FimpMessage) {
+	connectReport := map[string]string{"status": status, "error": err}
+	msg := fimpgo.NewStrMapMessage(
+		"evt.system.disconnect_report", "tibber", connectReport, nil, nil, oldMsg,
+	)
+	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+		log.WithError(err).Error("Could not publish MQTT message")
+	}
+}
