@@ -12,9 +12,7 @@ func (t *FimpTibberHandler) systemSync(oldMsg *fimpgo.Message) {
 		log.Error("Ad is not connected, not able to sync")
 		return
 	}
-	for _, home := range t.state.Homes {
-		t.sendInclusionReport(home, oldMsg.Payload)
-	}
+	t.sendInclusionReport(t.state.Home, oldMsg.Payload)
 	log.Info("System synced")
 }
 
@@ -24,20 +22,19 @@ func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
 		log.Error("Ad is not connected, no devices to exclude")
 		return
 	}
-	for _, home := range t.state.Homes {
-		t.sendExclusionReport(home.ID, msg.Payload)
-		if stream, ok := t.streams[home.ID]; ok {
-			stream.Stop()
-			delete(t.streams, home.ID)
-		}
-		_, err := t.tibber.SendPushNotification("Futurehome", home.AppNickname+" is now disconnected from Futurehome")
-		if err != nil {
-			log.Debug("Push failed", err)
-		}
+
+	t.sendExclusionReport(t.state.Home.ID, msg.Payload)
+	if stream, ok := t.streams[t.state.Home.ID]; ok {
+		stream.Stop()
+		delete(t.streams, t.state.Home.ID)
+	}
+	_, err := t.tibber.SendPushNotification("Futurehome", t.state.Home.AppNickname+" is now disconnected from Futurehome")
+	if err != nil {
+		log.Debug("Push failed", err)
 	}
 	t.state.Connected = false
 	t.state.AccessToken = ""
-	t.state.Homes = nil
+	t.state.Home = tibber.Home{}
 	if err := t.db.Write("data", "state", t.state); err != nil {
 		log.Error("Did not manage to write to file: ", err)
 	}
@@ -52,8 +49,10 @@ func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message)
 	}
 	if t.state.Connected {
 		val["security_key"] = t.state.AccessToken
+		val["home_id"] = t.state.Home.ID
 	} else {
 		val["security_key"] = "api_key"
+		val["home_id"] = "home_id"
 	}
 	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report", "tibber", val, nil, nil, oldMsg.Payload)
 	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
@@ -78,39 +77,64 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 	}
 
 	t.tibber.Token = val["security_key"]
-	homes, err := t.tibber.GetHomes()
-	if err != nil {
-		log.Error("Cannot get homes from Tibber - ", err)
-		t.tibber.Token = ""
-		return
-	}
 
-	for _, home := range homes {
-		log.Debug(home.ID)
-		if home.ID == "" {
+	// If home id is specified, connect to it. Otherwise connect to first home with RealTimeConsumptionEnabled
+	var homeId = val["home_id"]
+	if homeId != "" {
+		home, err := t.tibber.GetHomeById(homeId)
+		if err != nil {
+			log.Error("Cannot get home by id from Tibber - ", err)
+			t.tibber.Token = ""
 			return
 		}
+
 		if home.Features.RealTimeConsumptionEnabled {
-			t.state.Homes = append(t.state.Homes, home)
-			t.sendInclusionReport(home, oldMsg.Payload)
-			stream := tibber.NewStream(home.ID, t.tibber.Token)
-			stream.StartSubscription(t.tibberMsgCh)
-			t.streams[home.ID] = stream
-			_, err := t.tibber.SendPushNotification("Futurehome", home.AppNickname+" is now connected to Futurehome 🎉")
-			if err != nil {
-				log.Debug("Push failed", err)
+			t.startSubscriptionForHome(oldMsg, &home)
+			return
+		}
+	} else {
+		homes, err := t.tibber.GetHomes()
+		if err != nil {
+			log.Error("Cannot get homes from Tibber - ", err)
+			t.tibber.Token = ""
+			return
+		}
+
+		for _, home := range homes {
+			log.Debug(home.ID)
+			if home.ID == "" {
+				return
 			}
-			// Connect to pulse and start subscription
+			if home.Features.RealTimeConsumptionEnabled {
+				t.startSubscriptionForHome(oldMsg, &home)
+				return
+			}
 		}
 	}
 
-	if t.state.Homes != nil {
-		t.state.AccessToken = val["security_key"]
-		t.state.Connected = true
-	} else {
-		t.state.AccessToken = ""
-		t.state.Connected = false
+	log.Warning("Could not find home with real time consumption device")
+	t.state.AccessToken = ""
+	t.state.Connected = false
+
+	if err := t.db.Write("data", "state", t.state); err != nil {
+		log.Error("Did not manage to write to file: ", err)
+		return
 	}
+}
+
+func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, home *tibber.Home) {
+	t.state.Home = *home
+	t.sendInclusionReport(*home, oldMsg.Payload)
+	stream := tibber.NewStream(home.ID, t.tibber.Token)
+	stream.StartSubscription(t.tibberMsgCh)
+	t.streams[home.ID] = stream
+	_, err := t.tibber.SendPushNotification("Futurehome", home.AppNickname+" is now connected to Futurehome 🎉")
+	if err != nil {
+		log.Debug("Push failed", err)
+	}
+
+	t.state.AccessToken = t.tibber.Token
+	t.state.Connected = true
 
 	if err := t.db.Write("data", "state", t.state); err != nil {
 		log.Error("Did not manage to write to file: ", err)

@@ -5,7 +5,7 @@ import (
 )
 
 type State struct {
-	Connected   bool          `json:"connected"`
-	AccessToken string        `json:"accessToken"`
-	Homes       []tibber.Home `json:"homes"`
+	Connected   bool        `json:"connected"`
+	AccessToken string      `json:"accessToken"`
+	Home        tibber.Home `json:"home"`
 }

@@ -46,11 +46,9 @@ func (t *FimpTibberHandler) Start() error {
 	}
 	t.tibber.Token = t.state.AccessToken
 	if t.state.Connected {
-		for _, home := range t.state.Homes {
-			stream := tibber.NewStream(home.ID, t.tibber.Token)
-			stream.StartSubscription(t.tibberMsgCh)
-			t.streams[home.ID] = stream
-		}
+		stream := tibber.NewStream(t.state.Home.ID, t.tibber.Token)
+		stream.StartSubscription(t.tibberMsgCh)
+		t.streams[t.state.Home.ID] = stream
 	}
 	var errr error
 	go func(msgChan fimpgo.MessageCh) {
@@ -74,11 +72,9 @@ func (t *FimpTibberHandler) Start() error {
 }
 
 func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
-	//log.Debug("New tibber msg")
-	for _, home := range t.state.Homes {
-		if home.ID == msg.HomeID {
-			t.sendPowerMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), nil)
-		}
+	log.Debug("New tibber msg")
+	if t.state.Home.ID == msg.HomeID {
+		t.sendPowerMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), nil)
 	}
 }
 
