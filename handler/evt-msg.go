@@ -20,7 +20,9 @@ func (t *FimpTibberHandler) sendErrorReport(errString string, oldMsg *fimpgo.Fim
 		"evt.error.report", "tibber",
 		errString, nil, nil, oldMsg,
 	)
-	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
+		ResourceName: "tibber", ResourceAddress: "1"}
+	if err := t.mqt.Publish(&adr, msg); err != nil {
 		log.WithError(err).Error("Could not publish MQTT message")
 	}
 }
@@ -30,7 +32,9 @@ func (t *FimpTibberHandler) sendConnectReport(status string, err string, oldMsg 
 	msg := fimpgo.NewStrMapMessage(
 		"evt.system.connect_report", "tibber", connectReport, nil, nil, oldMsg,
 	)
-	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
+		ResourceName: "tibber", ResourceAddress: "1"}
+	if err := t.mqt.Publish(&adr, msg); err != nil {
 		log.WithError(err).Error("Could not publish MQTT message")
 	}
 }
@@ -40,7 +44,9 @@ func (t *FimpTibberHandler) sendDisconnectReport(status string, err string, oldM
 	msg := fimpgo.NewStrMapMessage(
 		"evt.system.disconnect_report", "tibber", connectReport, nil, nil, oldMsg,
 	)
-	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
+		ResourceName: "tibber", ResourceAddress: "1"}
+	if err := t.mqt.Publish(&adr, msg); err != nil {
 		log.WithError(err).Error("Could not publish MQTT message")
 	}
 }
