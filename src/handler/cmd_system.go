@@ -143,7 +143,7 @@ func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, hom
 
 func (t *FimpTibberHandler) sendConnectReport(oldMsg *fimpgo.Message, status string, err string) {
 	connectReport := map[string]string{"status": status, "error": err}
-	msg := fimpgo.NewStrMapMessage("evt.system.connect_report", "cmd.system.connect", connectReport, nil, nil, oldMsg.Payload)
+	msg := fimpgo.NewStrMapMessage("evt.system.connect_report", "tibber", connectReport, nil, nil, oldMsg.Payload)
 	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
 	if err := t.mqt.RespondToRequest(oldMsg.Payload, msg); err != nil {
 		t.mqt.Publish(&adr, msg)
