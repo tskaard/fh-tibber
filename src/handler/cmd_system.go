@@ -40,15 +40,12 @@ func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
 
 func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message) {
 	// request api_key
-	val := map[string]string{
-		"address": "api.tibber.com",
-		"id":      "tibber",
-	}
+	val := map[string]string{}
 	if t.state.Connected {
-		val["security_key"] = t.state.AccessToken
+		val["access_token"] = t.state.AccessToken
 		val["home_id"] = t.state.Home.ID
 	} else {
-		val["security_key"] = "api_key"
+		val["access_token"] = "access_token"
 		val["home_id"] = "home_id"
 	}
 	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",
@@ -69,16 +66,16 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 		log.Error("Wrong payload type , expected StrMap")
 		return
 	}
-	if val["security_key"] == "" {
+	if val["access_token"] == "" {
 		log.Error("Did not get a security_key")
 		return
 	}
 
-	t.tibber.Token = val["security_key"]
+	t.tibber.Token = val["access_token"]
 
 	// If home id is specified, connect to it. Otherwise connect to first home with RealTimeConsumptionEnabled
 	var homeId = val["home_id"]
-	if homeId != "" {
+	if homeId != "" && homeId != "home_id" {
 		home, err := t.tibber.GetHomeById(homeId)
 		if err != nil {
 			log.Error("Cannot get home by id from Tibber - ", err)
@@ -118,10 +115,11 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 		log.Error("Did not manage to write to file: ", err)
 		return
 	}
+
+	t.sendConnectReport(oldMsg, "error", "Could not find home with real time consumption device")
 }
 
 func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, home *tibber.Home) {
-	t.state.Home = *home
 	t.sendInclusionReport(*home, oldMsg.Payload)
 	stream := tibber.NewStream(home.ID, t.tibber.Token)
 	stream.StartSubscription(t.tibberMsgCh)
@@ -133,12 +131,23 @@ func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, hom
 
 	t.state.AccessToken = t.tibber.Token
 	t.state.Connected = true
+	t.state.Home = *home
 
 	if err := t.db.Write("data", "state", t.state); err != nil {
 		log.Error("Did not manage to write to file: ", err)
 		return
 	}
 	log.Debug("System connected")
+	t.sendConnectReport(oldMsg, "connected", "")
+}
+
+func (t *FimpTibberHandler) sendConnectReport(oldMsg *fimpgo.Message, status string, err string) {
+	connectReport := map[string]string{"status": status, "error": err}
+	msg := fimpgo.NewStrMapMessage("evt.system.connect_report", "cmd.system.connect", connectReport, nil, nil, oldMsg.Payload)
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
+	if err := t.mqt.RespondToRequest(oldMsg.Payload, msg); err != nil {
+		t.mqt.Publish(&adr, msg)
+	}
 }
 
 func (t *FimpTibberHandler) thingInclusionReport(msg *fimpgo.Message) {
