@@ -72,7 +72,6 @@ func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo
 		return
 	}
 
-	powerSensorService := createSensorService(home.ID, "sensor_power", []string{"W"}, "power")
 	priceSensorService := createSensorService(home.ID, "sensor_price", []string{currentPrice.Currency}, "price")
 	meterService := createMeterService(home.ID, "meter_elec", "meter")
 
@@ -82,7 +81,6 @@ func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo
 		ProductName:    "Tibber real time meter",
 		Groups:         []string{"ch_0"},
 		Services: []fimptype.Service{
-			powerSensorService,
 			priceSensorService,
 			meterService,
 		},

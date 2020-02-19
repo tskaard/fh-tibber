@@ -101,7 +101,7 @@ func (t *FimpTibberHandler) Start() error {
 func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 	log.Debug("New tibber msg")
 	if t.state.Home.ID == msg.HomeID {
-		t.sendSensorReportMsg(msg.HomeID, "sensor_power", float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
+		t.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
 	}
 }
 
