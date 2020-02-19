@@ -54,8 +54,12 @@ func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo
 		DeviceId:       home.MeteringPointData.ConsumptionEan,
 	}
 
-	msg := fimpgo.NewMessage("evt.thing.inclusion_report", "tibber", "object", incReort, nil, nil, oldMsg)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
-	t.mqt.Publish(&adr, msg)
+	msg := fimpgo.NewMessage(
+		"evt.thing.inclusion_report", "tibber", "object",
+		incReort, nil, nil, oldMsg,
+	)
+	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+		log.WithError(err).Error("Could not publish MQTT message")
+	}
 	log.Debug("Inclusion report sent")
 }

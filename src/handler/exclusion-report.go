@@ -10,8 +10,12 @@ func (t *FimpTibberHandler) sendExclusionReport(addr string, oldMsg *fimpgo.Fimp
 	exReport := fimptype.ThingExclusionReport{
 		Address: addr,
 	}
-	msg := fimpgo.NewMessage("evt.thing.exclusion_report", "tibber", "object", exReport, nil, nil, oldMsg)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
-	t.mqt.Publish(&adr, msg)
+	msg := fimpgo.NewMessage(
+		"evt.thing.exclusion_report", "tibber",
+		"object", exReport, nil, nil, oldMsg,
+	)
+	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+		log.WithError(err).Error("Could not publish MQTT message")
+	}
 	log.Debug("Exclusion report sent")
 }
