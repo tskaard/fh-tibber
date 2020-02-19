@@ -54,9 +54,9 @@ func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message)
 	}
 	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",
 		"tibber", val, nil, nil, oldMsg.Payload)
-	if err := t.mqt.RespondToRequest(oldMsg.Payload, msg); err == nil {
-		log.WithError(err).Error("Could not publish MQTT message")
-	}
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
+		ResourceName: "tibber", ResourceAddress: "1"}
+	t.mqt.Publish(&adr, msg)
 	log.Debug("Connect params message sent")
 }
 
