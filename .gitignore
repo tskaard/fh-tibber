@@ -1,5 +1,4 @@
 .DS_Store
-testdata
 tibber
 *.exe
 
@@ -11,4 +10,4 @@ package/build
 
 # IDE
 .idea
-.vscode
+state.json
