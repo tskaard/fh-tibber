@@ -129,6 +129,9 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 	case "cmd.thing.delete":
 		t.thingDelete(newMsg)
 
+	case "evt.gateway.factory_reset":
+		t.systemDisconnect(newMsg)
+
 	case "cmd.sensor.get_report":
 		log.Debug("cmd.sensor.get_report")
 

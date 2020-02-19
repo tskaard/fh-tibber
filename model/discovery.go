@@ -68,6 +68,11 @@ func GetDiscoveryResource() discovery.Resource {
 			MsgType:   "evt.stat.report",
 			ValueType: "string",
 			Version:   "1",
+		}, {
+			Type:      "in",
+			MsgType:   "evt.gateway.factory_reset",
+			ValueType: "null",
+			Version:   "1",
 		}}
 
 	adService := fimptype.Service{

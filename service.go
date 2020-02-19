@@ -77,6 +77,9 @@ func main() {
 
 	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
 	mqtt.Subscribe("pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
+	// Listen for the factory reset event
+	mqtt.Subscribe("pt:j1/mt:evt/rt:ad/rn:gateway/ad:1")
+
 	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
 	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
 
