@@ -74,7 +74,7 @@ func (t *FimpTibberHandler) Start() error {
 func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 	log.Debug("New tibber msg")
 	if t.state.Home.ID == msg.HomeID {
-		t.sendPowerMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), nil)
+		t.sendSensorReportMsg(msg.HomeID, "sensor_power", float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
 	}
 }
 
@@ -104,11 +104,22 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 
 	case "cmd.sensor.get_report":
 		log.Debug("cmd.sensor.get_report")
-		if newMsg.Payload.Service != "sensor_power" {
-			log.Error("sensor.get_report - Wrong service")
-			break
-		}
-		log.Debug("Maby do something here later")
-	}
 
+		if newMsg.Payload.Service == "sensor_price" {
+			currentPrice, err := t.tibber.GetCurrentPrice(t.state.Home.ID)
+			if err != nil {
+				log.Error("Cannot get prices from Tibber - ", err)
+				return
+			}
+			// TODO remove cast
+			t.sendSensorReportMsg(t.state.Home.ID, "sensor_price", float64(currentPrice.Total), currentPrice.Currency, newMsg.Payload)
+
+			log.Debug("Inclusion report sent")
+
+		} else if newMsg.Payload.Service == "sensor_power" {
+			log.Debug("cmd.sensor.get_report sensor_power requested but not implemented")
+		} else {
+			log.Error("sensor.get_report - Wrong service")
+		}
+	}
 }
