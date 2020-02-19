@@ -154,6 +154,7 @@ func (t *FimpTibberHandler) thingInclusionReport(msg *fimpgo.Message) {
 	if t.state.Home.ID == id {
 		t.sendInclusionReport(t.state.Home, msg.Payload)
 		log.WithField("id", id).Info("Inclusion report sent")
-		return
+	} else {
+		t.sendErrorReport("NOT_FOUND", msg.Payload)
 	}
 }
