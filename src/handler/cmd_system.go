@@ -184,6 +184,7 @@ func (t *FimpTibberHandler) thingDelete(msg *fimpgo.Message) {
 			stream.Stop()
 			delete(t.streams, t.state.Home.ID)
 		}
+		t.state.Home = tibber.Home{}
 		log.WithField("id", id).Info("Inclusion report sent")
 	} else {
 		t.sendErrorReport("NOT_FOUND", msg.Payload)
