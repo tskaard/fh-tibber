@@ -7,10 +7,11 @@ import (
 	"io/ioutil"
 
 	"github.com/futurehomeno/fimpgo"
+	"github.com/futurehomeno/fimpgo/discovery"
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/handler"
 	"github.com/tskaard/fh-tibber/model"
-	lumberjack "gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func SetupLog(logfile string, level string, logFormat string) {
@@ -58,13 +59,18 @@ func main() {
 	log.Info("--------------Starting Tibber----------------")
 
 	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
-	defer mqtt.Stop()
 	err = mqtt.Start()
 	if err != nil {
 		log.Error("Can't connect to broker. Error:", err.Error())
 	} else {
 		log.Info("--------------Connected----------------")
 	}
+	defer mqtt.Stop()
+
+	responder := discovery.NewServiceDiscoveryResponder(mqtt)
+	responder.RegisterResource(model.GetDiscoveryResource())
+	responder.Start()
+
 	fimpHandler := handler.NewFimpTibberHandler(mqtt, configs.StateDir)
 	fimpHandler.Start()
 	log.Info("--------------Started handler----------")
