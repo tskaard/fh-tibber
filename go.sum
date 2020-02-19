@@ -56,6 +56,8 @@ github.com/tskaard/tibber-golang v0.0.5 h1:IBQSPh9KbA4sWyRXnrm68TJBhLb+yLncLX6uN
 github.com/tskaard/tibber-golang v0.0.5/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
 github.com/tskaard/tibber-golang v0.0.6 h1:+nHir6tkyUeERb7eGmrob9sSJ2iuTWbus0dxa+QL4zQ=
 github.com/tskaard/tibber-golang v0.0.6/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
+github.com/tskaard/tibber-golang v0.0.7 h1:i1eTGot30U7XK5Pf7zaQ3ISUEaP4mmNs+sb5doc1HbA=
+github.com/tskaard/tibber-golang v0.0.7/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 h1:y6ce7gCWtnH+m3dCjzQ1PCuwl28DDIc3VNnvY29DlIA=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=

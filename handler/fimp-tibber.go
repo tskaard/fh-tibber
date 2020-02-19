@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/futurehomeno/fimpgo"
 	scribble "github.com/nanobox-io/golang-scribble"
 	log "github.com/sirupsen/logrus"
@@ -17,6 +19,7 @@ type FimpTibberHandler struct {
 	tibber       *tibber.Client
 	streams      map[string]*tibber.Stream
 	tibberMsgCh  tibber.MsgChan
+	ticker       *time.Ticker
 }
 
 // NewFimpTibberHandler construct new handler
@@ -68,6 +71,30 @@ func (t *FimpTibberHandler) Start() error {
 			}
 		}
 	}(t.tibberMsgCh)
+
+	// Set up ticker to poll information from Tibber
+	var fiveMinutes = 5 * time.Minute
+	t.ticker = time.NewTicker(fiveMinutes)
+	go func() {
+		for range t.ticker.C {
+			if time.Now().Minute() >= 5 { // Run ticker only on minutes 0 - 4
+				return
+			}
+
+			if t.state.Connected {
+				currentPrice, err := t.tibber.GetCurrentPrice(t.state.Home.ID)
+				if err != nil {
+					log.Error("Cannot get prices from Tibber - ", err)
+					return
+				}
+				t.sendSensorReportMsg(t.state.Home.ID, "sensor_price", currentPrice.Total, currentPrice.Currency, nil)
+				log.Debug("sensor_price sent")
+			} else {
+				log.Debug("------- NOT CONNECTED -------")
+			}
+		}
+	}()
+
 	return errr
 }
 
@@ -111,10 +138,9 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				log.Error("Cannot get prices from Tibber - ", err)
 				return
 			}
-			// TODO remove cast
-			t.sendSensorReportMsg(t.state.Home.ID, "sensor_price", float64(currentPrice.Total), currentPrice.Currency, newMsg.Payload)
 
-			log.Debug("Inclusion report sent")
+			t.sendSensorReportMsg(t.state.Home.ID, "sensor_price", currentPrice.Total, currentPrice.Currency, newMsg.Payload)
+			log.Debug("sensor_price sent")
 
 		} else if newMsg.Payload.Service == "sensor_power" {
 			log.Debug("cmd.sensor.get_report sensor_power requested but not implemented")
