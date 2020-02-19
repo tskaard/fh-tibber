@@ -7,7 +7,6 @@ import (
 )
 
 func (t *FimpTibberHandler) systemSync(oldMsg *fimpgo.Message) {
-	log.Debug("cmd.system.sync")
 	if !t.state.Connected || t.state.AccessToken == "" {
 		log.Error("Ad is not connected, not able to sync")
 		return
@@ -17,7 +16,6 @@ func (t *FimpTibberHandler) systemSync(oldMsg *fimpgo.Message) {
 }
 
 func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
-	log.Debug("cmd.system.disconnect")
 	if !t.state.Connected {
 		log.Error("Ad is not connected, no devices to exclude")
 		return
@@ -41,7 +39,6 @@ func (t *FimpTibberHandler) systemDisconnect(msg *fimpgo.Message) {
 }
 
 func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message) {
-	log.Debug("cmd.system.get_connect_params")
 	// request api_key
 	val := map[string]string{
 		"address": "api.tibber.com",
@@ -54,14 +51,15 @@ func (t *FimpTibberHandler) systemGetConnectionParameter(oldMsg *fimpgo.Message)
 		val["security_key"] = "api_key"
 		val["home_id"] = "home_id"
 	}
-	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report", "tibber", val, nil, nil, oldMsg.Payload)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
+	msg := fimpgo.NewStrMapMessage("evt.system.connect_params_report",
+		"tibber", val, nil, nil, oldMsg.Payload)
+	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
+		ResourceName: "tibber", ResourceAddress: "1"}
 	t.mqt.Publish(&adr, msg)
 	log.Debug("Connect params message sent")
 }
 
 func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
-	log.Debug("cmd.system.connect")
 	if t.state.Connected {
 		log.Error("App is already connected with system")
 		return
@@ -141,4 +139,21 @@ func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, hom
 		return
 	}
 	log.Debug("System connected")
+}
+
+func (t *FimpTibberHandler) thingInclusionReport(msg *fimpgo.Message) {
+	if !t.state.Connected {
+		log.Error("Ad is not connected, not able to sync")
+		return
+	}
+	id, err := msg.Payload.GetStringValue()
+	if err != nil {
+		log.Error("Wrong payload type , expected String")
+		return
+	}
+	if t.state.Home.ID == id {
+		t.sendInclusionReport(t.state.Home, msg.Payload)
+		log.WithField("id", id).Info("Inclusion report sent")
+		return
+	}
 }

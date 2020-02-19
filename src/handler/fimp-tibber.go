@@ -79,7 +79,7 @@ func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 }
 
 func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
-	log.Debug("New fimp msg")
+	log.WithField("type", newMsg.Payload.Type).Debug("New fimp msg")
 	switch newMsg.Payload.Type {
 	case "cmd.system.disconnect":
 		t.systemDisconnect(newMsg)
@@ -92,6 +92,13 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 
 	case "cmd.system.sync":
 		t.systemSync(newMsg)
+
+	case "cmd.network.get_all_nodes":
+	// TODO: Send information about all devices
+
+	case "cmd.thing.get_inclusion_report":
+		// Get inclusion report for a home
+		t.thingInclusionReport(newMsg)
 
 	case "cmd.sensor.get_report":
 		log.Debug("cmd.sensor.get_report")
