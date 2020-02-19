@@ -37,30 +37,58 @@ func createSensorService(addr string, service string, supUnits []string, alias s
 	return sensorService
 }
 
+func createMeterService(addr string, service string, alias string) fimptype.Service {
+	props := make(map[string]interface{})
+	props["sup_units"] = []string{"W", "kWh", "A", "V"}
+	props["sup_extended_vals"] = []string{
+		"p_import", "e_import", "e_export",
+		"last_e_import", "last_e_export",
+		"p_import_min", "p_import_avg", "p_import_max",
+		"p_export", "p_export_min", "p_export_max",
+		"u1", "u2", "u3",
+		"i1", "i2", "i3",
+	}
+	sensorService := fimptype.Service{
+		Address: "/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr,
+		Name:    service,
+		Groups:  []string{"ch_0"},
+		Alias:   alias,
+		Enabled: true,
+		Props:   props,
+		Interfaces: []fimptype.Interface{
+			createInterface("in", "cmd.meter.get_report", "null", "1"),
+			createInterface("in", "cmd.meter.get_extended_report", "null", "1"),
+			createInterface("out", "evt.meter.report", "float", "1"),
+			createInterface("out", "evt.meter.extended_report", "float_map", "1"),
+		},
+	}
+	return sensorService
+}
+
 func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo.FimpMessage) {
-	services := []fimptype.Service{}
-
-	powerSensorService := createSensorService(home.ID, "sensor_power", []string{"W"}, "power")
-	services = append(services, powerSensorService)
-
 	currentPrice, err := t.tibber.GetCurrentPrice(home.ID)
 	if err != nil {
 		log.Error("Cannot get prices from Tibber - ", err)
 		return
 	}
 
+	powerSensorService := createSensorService(home.ID, "sensor_power", []string{"W"}, "power")
 	priceSensorService := createSensorService(home.ID, "sensor_price", []string{currentPrice.Currency}, "price")
-	services = append(services, priceSensorService)
+	meterService := createMeterService(home.ID, "meter_elec", "meter")
 
 	incReort := fimptype.ThingInclusionReport{
 		Address:        home.ID,
 		CommTechnology: "tibber",
 		ProductName:    "Tibber real time meter",
 		Groups:         []string{"ch_0"},
-		Services:       services,
-		Alias:          home.AppNickname,
-		ProductId:      "HAN Solo",
-		DeviceId:       home.ID,
+		Services: []fimptype.Service{
+			powerSensorService,
+			priceSensorService,
+			meterService,
+		},
+		Alias:     home.AppNickname,
+		ProductId: "HAN Solo",
+		DeviceId:  home.ID,
 	}
 
 	msg := fimpgo.NewMessage("evt.thing.inclusion_report", "tibber", "object", incReort, nil, nil, oldMsg)
