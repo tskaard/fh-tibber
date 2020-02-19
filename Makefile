@@ -45,7 +45,7 @@ deb-arm: clean configure-arm build-go-arm package-deb-doc
 
 deb-amd : configure-amd64 build-go-amd package-deb-doc
 	@echo "Building Thingsplex AMD package"
-	mv package/debian.deb tibber_$(version)_amd64.deb
+	mv package/debian.deb package/build/tibber_$(version)_amd64.deb
 
 run :
 	cd ./src; go run service.go -c testdata/var/config.json;cd ../
