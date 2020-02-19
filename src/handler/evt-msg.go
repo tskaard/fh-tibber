@@ -20,12 +20,17 @@ func (t *FimpTibberHandler) sendErrorReport(errString string, oldMsg *fimpgo.Fim
 		"evt.error.report", "tibber",
 		errString, nil, nil, oldMsg,
 	)
-	adr := fimpgo.Address{
-		MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter,
-		ResourceName: "tibber", ResourceAddress: "1",
-	}
-	if err := t.mqt.Publish(&adr, msg); err != nil {
+	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
 		log.WithError(err).Error("Could not publish MQTT message")
 	}
-	log.Debug("Inclusion report sent")
+}
+
+func (t *FimpTibberHandler) sendConnectReport(status string, err string, oldMsg *fimpgo.FimpMessage) {
+	connectReport := map[string]string{"status": status, "error": err}
+	msg := fimpgo.NewStrMapMessage(
+		"evt.system.connect_report", "tibber", connectReport, nil, nil, oldMsg,
+	)
+	if err := t.mqt.RespondToRequest(oldMsg, msg); err == nil {
+		log.WithError(err).Error("Could not publish MQTT message")
+	}
 }

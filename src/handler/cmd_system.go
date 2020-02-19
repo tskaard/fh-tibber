@@ -116,7 +116,8 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 		return
 	}
 
-	t.sendConnectReport(oldMsg, "error", "Could not find home with real time consumption device")
+	t.sendConnectReport("error",
+		"Could not find home with real time consumption device", oldMsg.Payload)
 }
 
 func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, home *tibber.Home) {
@@ -138,16 +139,7 @@ func (t *FimpTibberHandler) startSubscriptionForHome(oldMsg *fimpgo.Message, hom
 		return
 	}
 	log.Debug("System connected")
-	t.sendConnectReport(oldMsg, "connected", "")
-}
-
-func (t *FimpTibberHandler) sendConnectReport(oldMsg *fimpgo.Message, status string, err string) {
-	connectReport := map[string]string{"status": status, "error": err}
-	msg := fimpgo.NewStrMapMessage("evt.system.connect_report", "tibber", connectReport, nil, nil, oldMsg.Payload)
-	adr := fimpgo.Address{MsgType: fimpgo.MsgTypeEvt, ResourceType: fimpgo.ResourceTypeAdapter, ResourceName: "tibber", ResourceAddress: "1"}
-	if err := t.mqt.RespondToRequest(oldMsg.Payload, msg); err != nil {
-		t.mqt.Publish(&adr, msg)
-	}
+	t.sendConnectReport("ok", "", oldMsg.Payload)
 }
 
 func (t *FimpTibberHandler) thingInclusionReport(msg *fimpgo.Message) {
