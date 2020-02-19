@@ -39,7 +39,7 @@ func createSensorService(addr string, service string, supUnits []string, alias s
 
 func createMeterService(addr string, service string, alias string) fimptype.Service {
 	props := make(map[string]interface{})
-	props["sup_units"] = []string{"W", "kWh", "A", "V"}
+	props["sup_units"] = []string{"W"}
 	props["sup_extended_vals"] = []string{
 		"p_import", "e_import", "e_export",
 		"last_e_import", "last_e_export",
