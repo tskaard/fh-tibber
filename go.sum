@@ -52,6 +52,10 @@ github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/tskaard/tibber-golang v0.0.4 h1:jTsKMzitKHxWkVlgkn2wmRloMdiieXLjSf6wa8wc2mE=
 github.com/tskaard/tibber-golang v0.0.4/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
+github.com/tskaard/tibber-golang v0.0.5 h1:IBQSPh9KbA4sWyRXnrm68TJBhLb+yLncLX6uN1K+HZM=
+github.com/tskaard/tibber-golang v0.0.5/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
+github.com/tskaard/tibber-golang v0.0.6 h1:+nHir6tkyUeERb7eGmrob9sSJ2iuTWbus0dxa+QL4zQ=
+github.com/tskaard/tibber-golang v0.0.6/go.mod h1:bWoQq7FKHLmqPLuFCegE11xasr1qwRvyKJYuxHEKF8s=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 h1:y6ce7gCWtnH+m3dCjzQ1PCuwl28DDIc3VNnvY29DlIA=
 golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=

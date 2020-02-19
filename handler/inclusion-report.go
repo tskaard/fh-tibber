@@ -38,11 +38,20 @@ func createSensorService(addr string, service string, supUnits []string, alias s
 }
 
 func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo.FimpMessage) {
+	services := []fimptype.Service{}
 
 	powerSensorService := createSensorService(home.ID, "sensor_power", []string{"W"}, "power")
-
-	services := []fimptype.Service{}
 	services = append(services, powerSensorService)
+
+	currentPrice, err := t.tibber.GetCurrentPrice(home.ID)
+	if err != nil {
+		log.Error("Cannot get prices from Tibber - ", err)
+		return
+	}
+
+	priceSensorService := createSensorService(home.ID, "sensor_price", []string{currentPrice.Currency}, "price")
+	services = append(services, priceSensorService)
+
 	incReort := fimptype.ThingInclusionReport{
 		Address:        home.ID,
 		CommTechnology: "tibber",

@@ -7,5 +7,5 @@
   "log_file": "",
   "log_level": "debug",
   "log_format": "text",
-  "state_dir": "../testdata/var/"
+  "state_dir": "testdata/var/"
 }
