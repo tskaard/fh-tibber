@@ -45,7 +45,7 @@ func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo
 	services = append(services, powerSensorService)
 	incReort := fimptype.ThingInclusionReport{
 		Address:        home.ID,
-		CommTechnology: "wss",
+		CommTechnology: "tibber",
 		ProductName:    "Tibber Pulse",
 		Groups:         []string{"ch_0"},
 		Services:       services,
