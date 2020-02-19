@@ -158,3 +158,26 @@ func (t *FimpTibberHandler) thingInclusionReport(msg *fimpgo.Message) {
 		t.sendErrorReport("NOT_FOUND", msg.Payload)
 	}
 }
+
+func (t *FimpTibberHandler) thingDelete(msg *fimpgo.Message) {
+	if !t.state.Connected {
+		log.Error("Ad is not connected, not able to sync")
+		return
+	}
+	id, err := msg.Payload.GetStringValue()
+	if err != nil {
+		log.Error("Wrong payload type , expected String")
+		return
+	}
+	if t.state.Home.ID == id {
+		t.sendExclusionReport(t.state.Home.ID, msg.Payload)
+		if stream, ok := t.streams[t.state.Home.ID]; ok {
+			stream.Stop()
+			delete(t.streams, t.state.Home.ID)
+		}
+		log.WithField("id", id).Info("Inclusion report sent")
+	} else {
+		t.sendErrorReport("NOT_FOUND", msg.Payload)
+	}
+
+}

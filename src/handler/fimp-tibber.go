@@ -97,8 +97,10 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 	// TODO: Send information about all devices
 
 	case "cmd.thing.get_inclusion_report":
-		// Get inclusion report for a home
 		t.thingInclusionReport(newMsg)
+
+	case "cmd.thing.delete":
+		t.thingDelete(newMsg)
 
 	case "cmd.sensor.get_report":
 		log.Debug("cmd.sensor.get_report")
