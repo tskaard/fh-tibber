@@ -84,15 +84,15 @@ func GetDiscoveryResource() discovery.Resource {
 	}
 	return discovery.Resource{
 		ResourceName:           "tibber",
-		ResourceType:           discovery.ResourceTypeApp,
+		ResourceType:           discovery.ResourceTypeAd,
 		ResourceFullName:       "Tibber",
-		Description:            "Meter data from Tibber to futurehome",
+		Description:            "Meter data from Tibber to Futurehome",
 		Author:                 "Tor Erik",
 		IsInstanceConfigurable: false,
 		InstanceId:             "1",
 		Version:                "1",
 		AdapterInfo: discovery.AdapterInfo{
-			Technology:            "hue",
+			Technology:            "tibber",
 			FwVersion:             "all",
 			NetworkManagementType: "inclusion_exclusion",
 			Services:              []fimptype.Service{adService},
