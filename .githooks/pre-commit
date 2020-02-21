@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# A  hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# This hook runs 'go fmt ./...' on staged Go files.
+# It will NOT proceed to commit the files if formatting has been applied.
+
+gofiles=$(git diff --cached --name-only --diff-filter=ACM | grep '.go$')
+[ -z "$gofiles" ] && exit 0
+
+checkfmt() {
+    hash gofmt 2>&- || { echo >&2 "pre-commit hook: gofmt not in PATH."; exit 1; }
+    IFS='
+'
+
+    unformatted=$(gofmt -l $gofiles)
+    # Return if no files need formatting
+    [ -z "$unformatted" ] && return 0
+
+    exitcode=0
+    formatted=false
+    for file in $gofiles
+    do
+        echo >&2 "pre-commit hook: Applying gofmt to $file"
+        output=`gofmt -w "$file"`
+        formatted=true
+        if test -n "$output"
+        then
+            # any output is a syntax error
+            echo >&2 "$output"
+            exitcode=1
+        fi
+        # git add "$file"
+    done
+
+    if [ "$formatted" = true ]
+    then
+        echo >&2 "pre-commit hook: gofmt has been applied to some files. Please review the changes and commit again"
+        echo >&2 "pre-commit hook: Changes not committed!!"
+        exit 1
+    fi
+
+    exit $exitcode
+}
+
+checkfmt
