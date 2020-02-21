@@ -101,7 +101,12 @@ func (t *FimpTibberHandler) Start() error {
 func (t *FimpTibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 	log.Debug("New tibber msg")
 	if t.state.Home.ID == msg.HomeID {
-		t.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
+		// Check if this is an extended or normal report
+		if msg.Payload.Data.LiveMeasurement.IsExtended() {
+			t.sendMeterExtendedReportMsg(msg.HomeID, msg.Payload.Data.LiveMeasurement.AsFloatMap(), nil)
+		} else {
+			t.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
+		}
 	}
 }
 
