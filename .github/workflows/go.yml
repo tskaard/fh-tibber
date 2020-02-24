@@ -24,13 +24,24 @@ jobs:
         if: github.event_name == 'release'
         run: make deb-arm
 
-      - name: Upload Release Asset
-        id: upload-release-asset
+#      - name: Upload Release Asset
+#        id: upload-release-asset
+#        if: github.event_name == 'release'
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: https://uploads.github.com/repos/tskaard/fh-tibber/releases/v0.1.2/asset
+##          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: package/build/tibber_0.1.6_armhf.deb
+#          asset_name: tibber_0.1.6_armhf.deb
+##          asset_content_type: application/vnd.debian.binary-package
+#          asset_content_type: multipart/form-data
+
+      - name: Upload the artifacts
         if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+        uses: skx/github-action-publish-binaries@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          asset_path: package/build/*.deb
-#         asset_name: my-artifact.zip
-#         asset_content_type: s
+          args: 'package/build/*.deb'
