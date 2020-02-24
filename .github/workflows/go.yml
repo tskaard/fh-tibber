@@ -2,8 +2,8 @@ name: Go
 on: [push,release]
 jobs:
 
-  setup:
-    name: Setup
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
 
@@ -16,24 +16,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-  build:
-    needs: setup
-    name: Build
-    if: github.event_name == 'push'
-    steps:
       - name: Build
+        if: github.event_name == 'push'
         run: make build-go
 
-  publish:
-    needs: setup
-    name: Publish
-    if: github.event_name == 'release'
-    steps:
       - name: Make package
+        if: github.event_name == 'release'
         run: make deb-arm
 
       - name: Upload Release Asset
         id: upload-release-asset
+        if: github.event_name == 'release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
