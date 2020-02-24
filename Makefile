@@ -5,7 +5,7 @@ arch="armhf"
 version:=`git describe --tags | cut -c 2-`
 
 clean:
-	-rm ./tibber
+	-rm -f ./tibber
 
 init:
 	git config core.hooksPath .githooks
@@ -38,6 +38,7 @@ package-deb-doc:clean-deb
 	@echo "Packaging application as debian package"
 	chmod a+x package/debian/DEBIAN/*
 	mkdir -p package/debian/var/log/futurehome/tibber package/debian/var/lib/futurehome/tibber/data
+	mkdir package/build
 	cp ./tibber package/debian/usr/bin/tibber
 	cp $(version_file) package/debian/var/lib/futurehome/tibber
 #	dpkg-deb --build package/debian
