@@ -31,6 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          upload_url: https://uploads.github.com/repos/tskaard/fh-tibber/releases/v0.1.2/asset
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: package/build/*.deb
-#         asset_name: my-artifact.zip
-#         asset_content_type: s
+          asset_name: package.deb
+          asset_content_type: application/zip
