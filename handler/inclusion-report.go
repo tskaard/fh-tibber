@@ -57,9 +57,9 @@ func createMeterService(addr string, service string, alias string) fimptype.Serv
 		Props:   props,
 		Interfaces: []fimptype.Interface{
 			createInterface("in", "cmd.meter.get_report", "null", "1"),
-			createInterface("in", "cmd.meter.get_extended_report", "null", "1"),
+			createInterface("in", "cmd.meter_ext.get_report", "null", "1"),
 			createInterface("out", "evt.meter.report", "float", "1"),
-			createInterface("out", "evt.meter.extended_report", "float_map", "1"),
+			createInterface("out", "evt.meter_ext.report", "float_map", "1"),
 		},
 	}
 	return sensorService

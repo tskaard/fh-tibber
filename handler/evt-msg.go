@@ -26,7 +26,7 @@ func (t *FimpTibberHandler) sendMeterReportMsg(addr string, value float64, unit 
 
 func (t *FimpTibberHandler) sendMeterExtendedReportMsg(addr string, value map[string]float64, oldMsg *fimpgo.FimpMessage) {
 	service := "meter_elec"
-	msg := fimpgo.NewFloatMapMessage("evt.meter.extended_report", "meter_elec", value, nil, nil, oldMsg)
+	msg := fimpgo.NewFloatMapMessage("evt.meter_ext.report", "meter_elec", value, nil, nil, oldMsg)
 	adr, _ := fimpgo.NewAddressFromString("pt:j1/mt:evt/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr)
 	if err := t.mqt.Publish(adr, msg); err != nil {
 		log.WithError(err).Error("Could not publish MQTT message")
