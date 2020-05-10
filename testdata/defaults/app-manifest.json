@@ -1,0 +1,243 @@
+{
+  "configs":[
+    {
+      "id": "param_1",
+      "label": {"en": "Param 1"},
+      "val_t": "bool",
+      "ui": {
+        "type": "list_radio",
+        "select": [{"val": true,"label": {"en": "Option 1"}},{"val": false,"label": {"en": "Option 2"}}]
+      },
+      "val": {
+        "default": false
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "init"
+    },
+    {
+      "id": "param_2",
+      "label": {"en": "Parameter 2"},
+      "val_t": "string",
+      "ui": {
+        "type": "select_horizontal",
+        "select": [{"val": "o1","label": {"en": "Option 1"}},{"val": "o2","label":{"en": "Option 2"}}]
+      },
+      "val": {
+        "default": "o1"
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "any"
+    },
+    {
+      "id": "param_3",
+      "label": {"en": "Parameter 3"},
+      "val_t": "str_map",
+      "ui": {
+        "type": "list_checkbox",
+        "select": [{"val": "o1","label": {"en": "Option 1"}},{"val": "o2","label": {"en": "Option 1"}},{"val":"o3", "label": {"en": "Option 3"}}]
+      },
+      "val": {
+        "default": ["o1","o2"]
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "init"
+    },
+    {
+      "id": "param_4",
+      "label": {"en": "Please enter the code into Apple Home app"},
+      "val_t": "string",
+      "ui": {
+        "type": "input_readonly"
+      },
+      "val": {
+        "default": ""
+      },
+      "is_required": false,
+      "hidden":false,
+      "config_point": "connection"
+    }
+  ],
+  "ui_buttons": [
+    {
+      "id":"fh.default.sync",
+      "label": {"en": "Sync"},
+      "req": {
+        "serv":"hue",
+        "intf_t": "cmd.system.sync",
+        "val": "action1"
+      },
+      "hidden":false
+    },
+    {
+      "id":"reconnect",
+      "label": {"en": "Reconnect"},
+      "req": {
+        "serv":"hue",
+        "intf_t": "cmd.system.reconnect",
+        "val": "action2"
+      },
+      "hidden":false
+    },{
+      "id":"factory_reset",
+      "label": {"en": "Factory reset"},
+      "req": {
+        "serv":"app-one",
+        "intf_t": "cmd.app.factory_reset",
+        "val": "action2"
+      },
+      "hidden":false
+    }
+
+  ],
+  "ui_blocks": [
+    {
+      "id": "block_1",
+      "header": {"en": "App configuration"},
+      "text": {"en": ""},
+      "configs": ["param_1","param_2","param_2"],
+      "buttons": ["reconnect"],
+      "footer": {"en": "footer text"},
+      "hidden":false
+    },
+    {
+      "id": "block_2",
+      "header": {"en": "Security"},
+      "text": {"en": ""},
+      "configs": ["param_4"],
+      "buttons": [],
+      "footer": {"en": "footer text"},
+      "hidden":false
+    },{
+      "id": "block_3",
+      "header": {"en": "Factory reset"},
+      "text": {"en": "The operation can't be undone"},
+      "configs": [],
+      "buttons": ["factory_reset"],
+      "footer": {"en": ""},
+      "hidden":false
+    }
+  ],
+  "auth": {
+    "type": "password",
+    "code_grant_login_page_url" : "",
+    "redirect_url": "",
+    "client_id": "",
+    "secret": "",
+    "partner_id": "",
+    "auth_endpoint": ""
+  },
+  "init_flow":["auth","connect"],
+  "services": [
+    {
+      "name": "hue",
+      "alias": "Network managment",
+      "address": "/rt:ad/rn:hue/ad:1",
+      "interfaces": [
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.app.get_manifest",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.system.sync",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.system.reconnect",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.app.manifest_report",
+          "val_t": "object",
+          "ver": "1"
+        },{
+          "intf_t": "out",
+          "msg_t": "cmd.app.get_full_state",
+          "val_t": "string",
+          "ver": "1"
+        },{
+          "intf_t": "out",
+          "msg_t": "cmd.app.full_state_report",
+          "val_t": "object",
+          "ver": "1"
+        },{
+          "intf_t": "in",
+          "msg_t": "cmd.config.extended_set",
+          "val_t": "str_map",
+          "ver": "1"
+        },{
+          "intf_t": "in",
+          "msg_t": "cmd.auth.set_tokens",
+          "val_t": "str_map",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.auth.login_report",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.network.get_all_nodes",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.thing.get_inclusion_report",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.thing.inclusion",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.thing.delete",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.thing.inclusion_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.thing.exclusion_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.network.all_nodes_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.log.set_level",
+          "val_t": "string",
+          "ver": "1"
+        }
+      ]
+    }
+  ],
+  "app_state": {
+
+  }
+}

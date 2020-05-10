@@ -54,7 +54,7 @@ deb-amd : configure-amd64 build-go-amd package-deb-doc
 	mv package/debian.deb package/build/tibber_$(version)_amd64.deb
 
 run :
-	 go run service.go -c testdata/var/config.json
+	 go run service.go -c testdata
 
 
 .phony : clean

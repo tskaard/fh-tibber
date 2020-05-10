@@ -23,7 +23,7 @@ type FimpTibberHandler struct {
 }
 
 // NewFimpTibberHandler construct new handler
-func NewFimpTibberHandler(transport *fimpgo.MqttTransport, stateFile string) *FimpTibberHandler {
+func NewFimpTibberHandler(transport *fimpgo.MqttTransport, stateDir string) *FimpTibberHandler {
 	t := &FimpTibberHandler{
 		inboundMsgCh: make(fimpgo.MessageCh, 5),
 		mqt:          transport,
@@ -32,7 +32,7 @@ func NewFimpTibberHandler(transport *fimpgo.MqttTransport, stateFile string) *Fi
 		tibberMsgCh:  make(tibber.MsgChan),
 		state:        model.State{},
 	}
-	t.db, _ = scribble.New(stateFile, nil)
+	t.db, _ = scribble.New(stateDir, nil)
 	t.mqt.RegisterChannel("ch1", t.inboundMsgCh)
 	return t
 }

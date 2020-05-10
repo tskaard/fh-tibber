@@ -1,62 +1,39 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/futurehomeno/fimpgo"
 	"github.com/futurehomeno/fimpgo/discovery"
+	"github.com/futurehomeno/fimpgo/edgeapp"
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/handler"
 	"github.com/tskaard/fh-tibber/model"
-	"gopkg.in/natefinch/lumberjack.v2"
+	"github.com/tskaard/fh-tibber/utils"
 )
 
-func SetupLog(logfile string, level string, logFormat string) {
-	if logFormat == "json" {
-		log.SetFormatter(&log.JSONFormatter{TimestampFormat: "2006-01-02 15:04:05.999"})
-	} else {
-		log.SetFormatter(&log.TextFormatter{FullTimestamp: true, ForceColors: true, TimestampFormat: "2006-01-02T15:04:05.999"})
-	}
-
-	logLevel, err := log.ParseLevel(level)
-	if err == nil {
-		log.SetLevel(logLevel)
-	} else {
-		log.SetLevel(log.DebugLevel)
-	}
-
-	if logfile != "" {
-		l := lumberjack.Logger{
-			Filename:   logfile,
-			MaxSize:    5, // megabytes
-			MaxBackups: 2,
-		}
-		log.SetOutput(&l)
-	}
-}
-
 func main() {
-	configs := model.Configs{}
-	var configFile string
-	flag.StringVar(&configFile, "c", "", "Config file")
+	var workDir string
+	flag.StringVar(&workDir, "c", "", "Work dir")
 	flag.Parse()
-	if configFile == "" {
-		configFile = "./config.json"
+	if workDir == "" {
+		workDir = "./"
 	} else {
-		fmt.Println("Loading configs from file ", configFile)
+		fmt.Println("Work dir ", workDir)
 	}
-	configFileBody, err := ioutil.ReadFile(configFile)
-	err = json.Unmarshal(configFileBody, &configs)
+	appLifecycle := edgeapp.NewAppLifecycle()
+
+	configs := edgeapp.NewConfigs(workDir)
+	err := configs.LoadFromFile()
 	if err != nil {
 		fmt.Print(err)
 		panic("Can't load config file.")
 	}
 
-	SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
+	utils.SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
 	log.Info("--------------Starting Tibber----------------")
+	appLifecycle.PublishSystemEvent(edgeapp.EventConfiguring, "main", nil)
 
 	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
 	err = mqtt.Start()
@@ -71,8 +48,9 @@ func main() {
 	responder.RegisterResource(model.GetDiscoveryResource())
 	responder.Start()
 
-	fimpHandler := handler.NewFimpTibberHandler(mqtt, configs.StateDir)
+	fimpHandler := handler.NewFimpTibberHandler(mqtt, configs.WorkDir)
 	fimpHandler.Start()
+
 	log.Info("--------------Started handler----------")
 
 	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")

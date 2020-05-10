@@ -78,9 +78,9 @@ func (t *FimpTibberHandler) systemConnect(oldMsg *fimpgo.Message) {
 	t.tibber.Token = val["access_token"]
 
 	// If home id is specified, connect to it. Otherwise connect to first home with RealTimeConsumptionEnabled
-	var homeId = val["home_id"]
-	if homeId != "" && homeId != "home_id" {
-		home, err := t.tibber.GetHomeById(homeId)
+	var homeID = val["home_id"]
+	if homeID != "" && homeID != "home_id" {
+		home, err := t.tibber.GetHomeById(homeID)
 		if err != nil {
 			log.Error("Cannot get home by id from Tibber - ", err)
 			t.tibber.Token = ""

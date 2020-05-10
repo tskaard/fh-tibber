@@ -4,7 +4,8 @@
   "mqtt_client_id_prefix":"tibber",
   "mqtt_server_username":"",
   "mqtt_server_password":"",
-  "log_file": "/var/log/futurehome/tibber/tibber.log",
+  "work_dir": "testdata",
+  "log_file": "",
   "log_level": "debug",
   "log_format": "text"
 }
