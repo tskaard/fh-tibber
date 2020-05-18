@@ -186,11 +186,11 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 			if t.env == utils.EnvBeta {
 				manifest.Auth.AuthEndpoint = "https://partners-beta.futurehome.io/api/control/edge/proxy/auth-code"
 				manifest.Auth.RedirectURL = "https://app-static-beta.futurehome.io/playground_oauth_callback"
-				manifest.Auth.CodeGrantLoginPageUrl = "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static-beta.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph"
+				manifest.Auth.CodeGrantLoginPageUrl = "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static-beta.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph price consumption"
 			} else {
 				manifest.Auth.AuthEndpoint = "https://partners.futurehome.io/api/control/edge/proxy/auth-code"
 				manifest.Auth.RedirectURL = "https://app-static.futurehome.io/playground_oauth_callback"
-				manifest.Auth.CodeGrantLoginPageUrl = "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph"
+				manifest.Auth.CodeGrantLoginPageUrl = "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph price consumption"
 			}
 
 			msg := fimpgo.NewMessage("evt.app.manifest_report", "tibber", fimpgo.VTypeObject, manifest, nil, nil, newMsg.Payload)

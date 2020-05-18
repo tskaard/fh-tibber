@@ -54,7 +54,7 @@
   ],
   "auth": {
     "type": "oauth2_code_grant",
-    "code_grant_login_page_url" : "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph",
+    "code_grant_login_page_url" : "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph price consumption",
     "redirect_url": "https://app-static.futurehome.io/playground_oauth_callback",
     "client_id": "8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8",
     "secret": "",
