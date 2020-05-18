@@ -5,34 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (t *FimpTibberHandler) sendSensorReportMsg(addr string, service string, value float64, unit string, oldMsg *fimpgo.FimpMessage) {
-	props := make(map[string]string)
-	props["unit"] = unit
-	msg := fimpgo.NewMessage("evt.sensor.report", service, "float", value, props, nil, oldMsg)
-	adr, _ := fimpgo.NewAddressFromString("pt:j1/mt:evt/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr)
-	t.mqt.Publish(adr, msg)
-}
-
-func (t *FimpTibberHandler) sendMeterReportMsg(addr string, value float64, unit string, oldMsg *fimpgo.FimpMessage) {
-	service := "meter_elec"
-	props := make(map[string]string)
-	props["unit"] = unit
-	msg := fimpgo.NewMessage("evt.meter.report", "meter_elec", "float", value, props, nil, oldMsg)
-	adr, _ := fimpgo.NewAddressFromString("pt:j1/mt:evt/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr)
-	if err := t.mqt.Publish(adr, msg); err != nil {
-		log.WithError(err).Error("Could not publish MQTT message")
-	}
-}
-
-func (t *FimpTibberHandler) sendMeterExtendedReportMsg(addr string, value map[string]float64, oldMsg *fimpgo.FimpMessage) {
-	service := "meter_elec"
-	msg := fimpgo.NewFloatMapMessage("evt.meter_ext.report", "meter_elec", value, nil, nil, oldMsg)
-	adr, _ := fimpgo.NewAddressFromString("pt:j1/mt:evt/rt:dev/rn:tibber/ad:1/sv:" + service + "/ad:" + addr)
-	if err := t.mqt.Publish(adr, msg); err != nil {
-		log.WithError(err).Error("Could not publish MQTT message")
-	}
-}
-
 func (t *FimpTibberHandler) sendErrorReport(errString string, oldMsg *fimpgo.FimpMessage) {
 	msg := fimpgo.NewStringMessage(
 		"evt.error.report", "tibber",

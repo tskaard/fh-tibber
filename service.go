@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/futurehomeno/fimpgo"
 	"github.com/futurehomeno/fimpgo/discovery"
 	"github.com/futurehomeno/fimpgo/edgeapp"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/handler"
 	"github.com/tskaard/fh-tibber/model"
@@ -24,19 +26,32 @@ func main() {
 	}
 	appLifecycle := edgeapp.NewAppLifecycle()
 
-	configs := edgeapp.NewConfigs(workDir)
+	configs := model.NewConfigs(workDir)
 	err := configs.LoadFromFile()
 	if err != nil {
+		appLifecycle.SetAppState(edgeapp.AppStateStartupError, nil)
 		fmt.Print(err)
 		panic("Can't load config file.")
+
+	}
+	if err != nil {
+		appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
+		log.Debug("Not able to load state")
+		log.Debug(err)
 	}
 
 	utils.SetupLog(configs.LogFile, configs.LogLevel, configs.LogFormat)
 	log.Info("--------------Starting Tibber----------------")
-	appLifecycle.PublishSystemEvent(edgeapp.EventConfiguring, "main", nil)
+	appLifecycle.SetAppState(edgeapp.AppStateStarting, nil)
+	appLifecycle.SetAuthState(edgeapp.AuthStateNotAuthenticated)
+	appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
+	appLifecycle.SetConnectionState(edgeapp.ConnStateDisconnected)
 
 	mqtt := fimpgo.NewMqttTransport(configs.MqttServerURI, configs.MqttClientIdPrefix, configs.MqttUsername, configs.MqttPassword, true, 1, 1)
 	err = mqtt.Start()
+	responder := discovery.NewServiceDiscoveryResponder(mqtt)
+	responder.RegisterResource(model.GetDiscoveryResource())
+	responder.Start()
 	if err != nil {
 		log.Error("Can't connect to broker. Error:", err.Error())
 	} else {
@@ -44,22 +59,34 @@ func main() {
 	}
 	defer mqtt.Stop()
 
-	responder := discovery.NewServiceDiscoveryResponder(mqtt)
-	responder.RegisterResource(model.GetDiscoveryResource())
-	responder.Start()
+	if err := edgeapp.NewSystemCheck().WaitForInternet(5 * time.Minute); err == nil {
+		log.Info("<main> Internet connection - OK")
+	} else {
+		log.Error("<main> Internet connection - ERROR")
+	}
 
-	fimpHandler := handler.NewFimpTibberHandler(mqtt, configs.WorkDir)
+	tibberHandler := handler.NewTibberHandler(mqtt, appLifecycle)
+
+	if configs.AccessToken == "" && configs.HomeID == "" {
+		log.Info("<main> Token is not set. The app is not configured")
+		appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
+	} else {
+		err := tibberHandler.Start(configs.AccessToken, configs.HomeID)
+		if err != nil {
+			// Handle error
+		}
+		appLifecycle.SetConfigState(edgeapp.ConfigStateConfigured)
+		appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
+		appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+		appLifecycle.SetAppState(edgeapp.AppStateRunning, nil)
+	}
+
+	fimpHandler := handler.NewFimpTibberHandler(mqtt, appLifecycle, tibberHandler, configs)
 	fimpHandler.Start()
 
-	log.Info("--------------Started handler----------")
+	for {
+		appLifecycle.WaitForState("main", edgeapp.AppStateRunning)
+		select {}
+	}
 
-	mqtt.Subscribe("pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
-	mqtt.Subscribe("pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
-	// Listen for the factory reset event
-	mqtt.Subscribe("pt:j1/mt:evt/rt:ad/rn:gateway/ad:1")
-
-	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:ad/rn:tibber/ad:1")
-	log.Info("Subscribing to topic: pt:j1/mt:cmd/rt:dev/rn:tibber/ad:1/#")
-
-	select {}
 }

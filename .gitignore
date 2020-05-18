@@ -10,4 +10,5 @@ package/build
 
 # IDE
 .idea
+.vscode
 state.json

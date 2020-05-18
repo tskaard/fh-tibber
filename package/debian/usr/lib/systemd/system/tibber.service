@@ -3,7 +3,7 @@ Description=Tibber Pulse app
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/tibber -c /etc/futurehome/tibber/config.json
+ExecStart=/usr/bin/tibber
 User=tibber
 WorkingDirectory=/var/lib/futurehome/tibber
 Restart=always

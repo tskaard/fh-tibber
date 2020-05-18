@@ -66,7 +66,7 @@ func createMeterService(addr string, service string, alias string) fimptype.Serv
 }
 
 func (t *FimpTibberHandler) sendInclusionReport(home tibber.Home, oldMsg *fimpgo.FimpMessage) {
-	currentPrice, err := t.tibber.GetCurrentPrice(home.ID)
+	currentPrice, err := t.tibber.client.GetCurrentPrice(home.ID)
 	if err != nil {
 		log.Error("Cannot get prices from Tibber - ", err)
 		return

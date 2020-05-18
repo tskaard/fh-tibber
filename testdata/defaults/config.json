@@ -7,5 +7,9 @@
   "work_dir": "testdata",
   "log_file": "",
   "log_level": "debug",
-  "log_format": "text"
+  "log_format": "text",
+  "configured_at": "",
+  "configured_by":"auto",
+  "access_token":"",
+  "home_id": ""
 }
