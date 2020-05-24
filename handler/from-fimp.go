@@ -125,7 +125,9 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				var status string
 				errStr := ""
 				if t.tibber.stream.ID != "" {
-					t.tibber.stream.StartSubscription(t.tibber.msgChan)
+					//t.tibber.stream.StartSubscription(t.tibber.msgChan)
+					t.tibber.Start(t.tibber.client.Token, t.tibber.stream.ID)
+
 					t.tibber.client.SendPushNotification("Futurehome", t.tibber.home.AppNickname+" is now connected to Futurehome 🎉")
 					t.configs.SaveToFile()
 

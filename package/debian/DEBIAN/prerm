@@ -3,4 +3,5 @@ set -e
 
 if [ -d /run/systemd/system ] && [ "$1" = remove ]; then
   deb-systemd-invoke stop tibber.service >/dev/null
+  systemctl disable app-one.service || true
 fi

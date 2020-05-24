@@ -4,12 +4,10 @@ require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/buger/jsonparser v1.0.0 // indirect
 	github.com/futurehomeno/fimpgo v1.5.3
-	github.com/jcelliott/lumber v0.0.0-20160324203708-dd349441af25 // indirect
-	github.com/labstack/gommon v0.3.0
-	github.com/nanobox-io/golang-scribble v0.0.0-20190309225732-aa3e7c118975
+	github.com/gorilla/websocket v1.4.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.6.0
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
+	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/tskaard/tibber-golang v0.1.2
 	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
 	golang.org/x/sys v0.0.0-20200515095857-1151b9dac4a9 // indirect

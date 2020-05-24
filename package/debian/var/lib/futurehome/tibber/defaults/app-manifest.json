@@ -1,0 +1,169 @@
+{
+  "configs":[
+    {
+      "id": "connection_state",
+      "label": {"en": "Connection state"},
+      "val_t": "string",
+      "ui": {
+        "type": "text"
+      },
+      "val": {
+        "default": ""
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "any"
+    },
+    {
+      "id": "errors",
+      "label": {"en": "Last error"},
+      "val_t": "string",
+      "ui": {
+        "type": "text_error"
+      },
+      "val": {
+        "default": ""
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "any"
+    }
+  ],
+  "ui_buttons": [
+    {
+      "id":"fh.default.sync",
+      "label": {"en": "Synchronize devices"},
+      "req": {
+        "serv":"tibber",
+        "intf_t": "cmd.system.sync",
+        "val": "all"
+      },
+      "hidden":false
+    }
+  ],
+  "ui_blocks": [
+    {
+      "id": "block_1",
+      "header": {"en": "Configuration status"},
+      "text": {"en": ""},
+      "configs": ["connection_state","errors"],
+      "buttons": ["fh.default.sync"],
+      "footer": {"en": ""},
+      "hidden":false
+    }
+  ],
+  "auth": {
+    "type": "oauth2_code_grant",
+    "code_grant_login_page_url" : "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph",
+    "redirect_url": "https://app-static.futurehome.io/playground_oauth_callback",
+    "client_id": "8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8",
+    "secret": "",
+    "partner_id": "tibber",
+    "auth_endpoint": "https://partners.futurehome.io/api/control/edge/proxy/auth-code"
+  },
+  "init_flow":["auth","connect"],
+  "services": [
+    {
+      "name": "tibber",
+      "alias": "Network managment",
+      "address": "/rt:ad/rn:tibber/ad:1",
+      "interfaces": [
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.app.get_manifest",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.system.sync",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.system.reconnect",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.app.manifest_report",
+          "val_t": "object",
+          "ver": "1"
+        },{
+          "intf_t": "out",
+          "msg_t": "cmd.app.get_full_state",
+          "val_t": "string",
+          "ver": "1"
+        },{
+          "intf_t": "out",
+          "msg_t": "cmd.app.full_state_report",
+          "val_t": "object",
+          "ver": "1"
+        },{
+          "intf_t": "in",
+          "msg_t": "cmd.config.extended_set",
+          "val_t": "str_map",
+          "ver": "1"
+        },{
+          "intf_t": "in",
+          "msg_t": "cmd.auth.set_tokens",
+          "val_t": "str_map",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.auth.login_report",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.network.get_all_nodes",
+          "val_t": "null",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.thing.get_inclusion_report",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.thing.delete",
+          "val_t": "string",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.thing.inclusion_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.thing.exclusion_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "out",
+          "msg_t": "evt.network.all_nodes_report",
+          "val_t": "object",
+          "ver": "1"
+        },
+        {
+          "intf_t": "in",
+          "msg_t": "cmd.log.set_level",
+          "val_t": "string",
+          "ver": "1"
+        }
+      ]
+    }
+  ],
+  "app_state": {
+
+  }
+}

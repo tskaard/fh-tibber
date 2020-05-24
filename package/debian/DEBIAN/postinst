@@ -15,7 +15,7 @@ fi
 deb-systemd-helper unmask tibber.service >/dev/null || true
 
 if deb-systemd-helper --quiet was-enabled tibber.service; then
-  deb-systemd-helper enable tibber.service >/dev/null || true
+  systemctl enable tibber.service || true
 else
   deb-systemd-helper update-state tibber.service >/dev/null || true
 fi

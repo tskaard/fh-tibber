@@ -22,9 +22,9 @@ type AuthData struct {
 type TibberHandler struct {
 	mqtt   *fimpgo.MqttTransport
 	client *tibber.Client
-	stream *tibber.Stream
+	stream *Stream
 	//streams      map[string]*tibber.Stream
-	msgChan      tibber.MsgChan
+	msgChan      MsgChan
 	ticker       *time.Ticker
 	home         *tibber.Home
 	appLifecycle *edgeapp.Lifecycle
@@ -36,11 +36,11 @@ func NewTibberHandler(transport *fimpgo.MqttTransport, appLifecycle *edgeapp.Lif
 		mqtt:         transport,
 		appLifecycle: appLifecycle,
 		client:       tibber.NewClient(""),
-		stream:       &tibber.Stream{},
-		//streams:      make(map[string]*tibber.Stream),
-		msgChan: make(tibber.MsgChan),
-		home:    &tibber.Home{},
+		msgChan:      make(MsgChan),
+		home:         &tibber.Home{},
 	}
+	th.stream = NewStream("", "")
+	th.StartStreamStateEventListener()
 	return th
 }
 
@@ -59,7 +59,7 @@ func (th *TibberHandler) Start(token string, homeID string) error {
 	th.stream.Token = token
 	th.stream.ID = th.home.ID
 	th.stream.StartSubscription(th.msgChan)
-	go func(msgChan tibber.MsgChan) {
+	go func(msgChan MsgChan) {
 		for {
 			select {
 			case msg := <-msgChan:
@@ -69,6 +69,20 @@ func (th *TibberHandler) Start(token string, homeID string) error {
 	}(th.msgChan)
 	th.startPolling()
 	return err
+}
+
+func (th *TibberHandler) StartStreamStateEventListener() {
+	go func() {
+		for {
+			stateMsg := <-th.stream.StateReportChan()
+			switch stateMsg.State {
+			case StreamStateConnected:
+				th.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+			case StreamStateDisconnected:
+				th.appLifecycle.SetConnectionState(edgeapp.ConnStateDisconnected)
+			}
+		}
+	}()
 }
 
 func (th *TibberHandler) startPolling() {
@@ -95,7 +109,7 @@ func (th *TibberHandler) startPolling() {
 	}()
 }
 
-func (th *TibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
+func (th *TibberHandler) routeTibberMessage(msg *StreamMsg) {
 	log.Debug("New tibber msg")
 	if th.home.ID == msg.HomeID {
 		// Check if this is an extended or normal report
