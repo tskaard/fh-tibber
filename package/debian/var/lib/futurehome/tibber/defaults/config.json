@@ -1,0 +1,15 @@
+{
+  "instance_address":"1",
+  "mqtt_server_uri":"tcp://localhost:1883",
+  "mqtt_client_id_prefix":"tibber",
+  "mqtt_server_username":"",
+  "mqtt_server_password":"",
+  "work_dir": "/var/lib/futurehome/tibber",
+  "log_file": "/var/log/futurehome/tibber/tibber.log",
+  "log_level": "info",
+  "log_format": "text",
+  "configured_at": "",
+  "configured_by":"auto",
+  "access_token":"",
+  "home_id": ""
+}

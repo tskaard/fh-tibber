@@ -3,6 +3,8 @@ working_dir=$(shell pwd)
 arch="armhf"
 # Remove `v` from the tag: v0.0.7 -> 0.0.7
 version:=`git describe --tags | cut -c 2-`
+#version:="1.0.1"
+remote_host = "fh@cube.local"
 
 clean:
 	-rm -f ./tibber
@@ -52,6 +54,15 @@ deb-arm: clean configure-arm build-go-arm package-deb-doc
 deb-amd : configure-amd64 build-go-amd package-deb-doc
 	@echo "Building Thingsplex AMD package"
 	mv package/debian.deb package/build/tibber_$(version)_amd64.deb
+
+upload :
+	scp package/build/tibber_$(version)_armhf.deb $(remote_host):~/
+
+remote-install : upload
+	ssh -t $(remote_host) "sudo dpkg -i tibber_$(version)_armhf.deb"
+
+deb-remote-install : deb-arm remote-install
+	@echo "Installed on remote host"
 
 run :
 	 go run service.go -c testdata
