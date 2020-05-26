@@ -171,12 +171,13 @@ func (ts *Stream) msgLoop() {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error("<TibberStream> Process CRASHED with error: ", r)
+			time.Sleep(1*time.Minute)
 		}
 		if ts.client != nil {
 			ts.client.Close()
 		}
 	}()
-
+	var unknownErrorCounter int
 	for {
 		if !ts.initialized {
 			ts.sendInitMsg()
@@ -184,28 +185,34 @@ func (ts *Stream) msgLoop() {
 		tm := StreamMsg{}
 		err := ts.client.ReadJSON(&tm)
 		if err != nil {
-			if websocket.IsCloseError(err,
-				websocket.CloseGoingAway,
-				websocket.CloseAbnormalClosure,
-				websocket.CloseNormalClosure) {
-				log.WithError(err).Error("<TibberStream> CloseError, Reconnecting after 7 seconds")
+			if ts.isWsCloseError(err) {
+				log.WithError(err).Error("<TibberStream> CloseError, Reconnecting after 10 seconds")
 				ts.reportState(StreamStateDisconnected, err)
 				time.Sleep(time.Second * 10) // trying to repair the connection
 				ts.initialized = false
 				err = ts.connect()
 				if err != nil {
 					log.WithError(err).Error("<TibberStream> Could not connect to websocket")
-				} else {
-					ts.reportState(StreamStateConnected, err)
+					time.Sleep(time.Second * 30)
 				}
 				continue
 			} else {
-				log.WithError(err).Error()
+				unknownErrorCounter++
+				log.WithError(err).Error("<TibberStream> Unknown error while reading data from WS")
 				ts.reportState(StreamStateDisconnected, err)
 				time.Sleep(time.Second * 20)
+				if unknownErrorCounter > 10 {
+					ts.client.Close()
+					err = ts.connect()
+					if err != nil {
+						log.WithError(err).Error("<TibberStream> Could not connect to websocket")
+						time.Sleep(time.Second * 60)
+					}
+				}
 				continue
 			}
 		} else {
+			unknownErrorCounter = 0
 			switch tm.Type {
 			case "init_success":
 				log.Info("<TibberStream> Init success")
@@ -225,8 +232,7 @@ func (ts *Stream) msgLoop() {
 				ts.reportState(StreamStateDisconnected, err)
 
 			default:
-				err := fmt.Errorf("unexpected message: %s", tm.Type)
-				log.WithError(err).Error("<TibberStream>")
+				log.Info("<TibberStream> Unexpected message type : %s",tm.Type)
 			}
 		}
 		if !ts.isRunning {
@@ -235,11 +241,29 @@ func (ts *Stream) msgLoop() {
 		}
 	}
 }
+func (ts *Stream) isWsCloseError(err error)bool {
+	return websocket.IsCloseError(err,
+		websocket.CloseGoingAway,
+		websocket.CloseAbnormalClosure,
+		websocket.CloseNormalClosure,
+		websocket.CloseProtocolError,
+		websocket.CloseUnsupportedData,
+		websocket.CloseNoStatusReceived,
+		websocket.CloseInvalidFramePayloadData,
+		websocket.ClosePolicyViolation,
+		websocket.CloseMessageTooBig,
+		websocket.CloseMandatoryExtension,
+		websocket.CloseInternalServerErr,
+		websocket.CloseServiceRestart,
+		websocket.CloseTryAgainLater,
+		websocket.CloseTLSHandshake)
+}
 
 func (ts *Stream) connect() error {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error("<TibberStream> ID: ", ts.ID, " - Process CRASHED with error : ", r)
+			time.Sleep(time.Minute*1)
 		}
 	}()
 	u := url.URL{Scheme: "wss", Host: tibberHost, Path: subscriptionEndpoint}
@@ -256,6 +280,7 @@ func (ts *Stream) connect() error {
 		} else {
 			log.Info("<TibberStream> WS Client is connected - ID: ", ts.ID, " error: ", err)
 			ts.isRunning = true
+			ts.reportState(StreamStateConnected, err)
 			return nil
 		}
 	}
