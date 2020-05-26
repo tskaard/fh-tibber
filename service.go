@@ -3,16 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"time"
-
 	"github.com/futurehomeno/fimpgo"
 	"github.com/futurehomeno/fimpgo/discovery"
 	"github.com/futurehomeno/fimpgo/edgeapp"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/handler"
 	"github.com/tskaard/fh-tibber/model"
 	"github.com/tskaard/fh-tibber/utils"
+	"time"
 )
 
 func main() {
