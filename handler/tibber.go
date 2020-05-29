@@ -47,13 +47,21 @@ func NewTibberHandler(transport *fimpgo.MqttTransport, appLifecycle *edgeapp.Lif
 // Start tibber handler service and listen to ws events
 func (th *TibberHandler) Start(token string, homeID string) error {
 	var err error
-
+	var home tibber.Home
 	th.client.Token = token
-	home, err := th.client.GetHomeById(homeID)
+	for i:=0;i<10;i++ {
+		home, err = th.client.GetHomeById(homeID)
+		if err == nil {
+			break
+		}else {
+			log.Error("<tibber> error getting home by id")
+			time.Sleep(60*time.Second)
+		}
+	}
 	if err != nil {
-		log.Error("<tibber> error getting home by id")
 		return err
 	}
+	log.Info("The Home successfully fetched from Tibber.")
 	th.home = &home
 	// Setting up stream
 	th.stream.Token = token

@@ -69,14 +69,17 @@ func main() {
 		log.Info("<main> Token is not set. The app is not configured")
 		appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
 	} else {
-		err := tibberHandler.Start(configs.AccessToken, configs.HomeID)
-		if err != nil {
-			// Handle error
-		}
 		appLifecycle.SetConfigState(edgeapp.ConfigStateConfigured)
 		appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
-		appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+		err := tibberHandler.Start(configs.AccessToken, configs.HomeID)
 		appLifecycle.SetAppState(edgeapp.AppStateRunning, nil)
+		if err != nil {
+			// Handle error
+			appLifecycle.SetConnectionState(edgeapp.ConnStateDisconnected)
+			appLifecycle.SetLastError(fmt.Sprint("Can't connect to Tibber api . Err:",err.Error()))
+		}else {
+			appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+		}
 	}
 
 	fimpHandler := handler.NewFimpTibberHandler(mqtt, appLifecycle, tibberHandler, configs)
