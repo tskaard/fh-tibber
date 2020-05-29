@@ -76,6 +76,11 @@ func (m *LiveMeasurement) IsExtended() bool {
 	return m.CurrentPhase1 > 0 || m.CurrentPhase2 > 0 || m.CurrentPhase3 > 0
 }
 
+// HasPower returns true if the report contains power measurement
+func (m *LiveMeasurement) HasPower() bool {
+	return m.Power > 0
+}
+
 // AsFloatMap returns the LiveMeasurement struct as a float map
 func (m *LiveMeasurement) AsFloatMap() map[string]float64 {
 	return map[string]float64{
@@ -171,7 +176,7 @@ func (ts *Stream) msgLoop() {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error("<TibberStream> Process CRASHED with error: ", r)
-			time.Sleep(1*time.Minute)
+			time.Sleep(1 * time.Minute)
 		}
 		if ts.client != nil {
 			ts.client.Close()
@@ -232,7 +237,7 @@ func (ts *Stream) msgLoop() {
 				ts.reportState(StreamStateDisconnected, err)
 
 			default:
-				log.Info("<TibberStream> Unexpected message type : %s",tm.Type)
+				log.Info("<TibberStream> Unexpected message type : %s", tm.Type)
 			}
 		}
 		if !ts.isRunning {
@@ -241,7 +246,7 @@ func (ts *Stream) msgLoop() {
 		}
 	}
 }
-func (ts *Stream) isWsCloseError(err error)bool {
+func (ts *Stream) isWsCloseError(err error) bool {
 	return websocket.IsCloseError(err,
 		websocket.CloseGoingAway,
 		websocket.CloseAbnormalClosure,
@@ -263,7 +268,7 @@ func (ts *Stream) connect() error {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error("<TibberStream> ID: ", ts.ID, " - Process CRASHED with error : ", r)
-			time.Sleep(time.Minute*1)
+			time.Sleep(time.Minute * 1)
 		}
 	}()
 	u := url.URL{Scheme: "wss", Host: tibberHost, Path: subscriptionEndpoint}

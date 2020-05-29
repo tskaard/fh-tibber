@@ -112,11 +112,15 @@ func (th *TibberHandler) startPolling() {
 func (th *TibberHandler) routeTibberMessage(msg *StreamMsg) {
 	log.Debug("New tibber msg")
 	if th.home.ID == msg.HomeID {
+		// Chek if measurement has power reading
+		// Should be enough to only send extended report, but app does not use power from extended report yet.
+		// This is a "fix" for Kamstrup that only sends data every 10 sec
+		if msg.Payload.Data.LiveMeasurement.HasPower() {
+			th.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
+		}
 		// Check if this is an extended or normal report
 		if msg.Payload.Data.LiveMeasurement.IsExtended() {
 			th.sendMeterExtendedReportMsg(msg.HomeID, msg.Payload.Data.LiveMeasurement.AsFloatMap(), nil)
-		} else {
-			th.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
 		}
 	}
 }
