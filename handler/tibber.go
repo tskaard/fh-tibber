@@ -22,9 +22,9 @@ type AuthData struct {
 type TibberHandler struct {
 	mqtt   *fimpgo.MqttTransport
 	client *tibber.Client
-	stream *Stream
+	stream *tibber.Stream
 	//streams      map[string]*tibber.Stream
-	msgChan      MsgChan
+	msgChan      tibber.MsgChan
 	ticker       *time.Ticker
 	home         *tibber.Home
 	appLifecycle *edgeapp.Lifecycle
@@ -36,10 +36,10 @@ func NewTibberHandler(transport *fimpgo.MqttTransport, appLifecycle *edgeapp.Lif
 		mqtt:         transport,
 		appLifecycle: appLifecycle,
 		client:       tibber.NewClient(""),
-		msgChan:      make(MsgChan),
+		msgChan:      make(tibber.MsgChan),
 		home:         &tibber.Home{},
 	}
-	th.stream = NewStream("", "")
+	th.stream = tibber.NewStream("", "")
 	th.StartStreamStateEventListener()
 	return th
 }
@@ -49,13 +49,13 @@ func (th *TibberHandler) Start(token string, homeID string) error {
 	var err error
 	var home tibber.Home
 	th.client.Token = token
-	for i:=0;i<10;i++ {
+	for i := 0; i < 10; i++ {
 		home, err = th.client.GetHomeById(homeID)
 		if err == nil {
 			break
-		}else {
+		} else {
 			log.Error("<tibber> error getting home by id")
-			time.Sleep(60*time.Second)
+			time.Sleep(60 * time.Second)
 		}
 	}
 	if err != nil {
@@ -67,7 +67,7 @@ func (th *TibberHandler) Start(token string, homeID string) error {
 	th.stream.Token = token
 	th.stream.ID = th.home.ID
 	th.stream.StartSubscription(th.msgChan)
-	go func(msgChan MsgChan) {
+	go func(msgChan tibber.MsgChan) {
 		for {
 			select {
 			case msg := <-msgChan:
@@ -79,14 +79,15 @@ func (th *TibberHandler) Start(token string, homeID string) error {
 	return err
 }
 
+// StartStreamStateEventListener start event listener
 func (th *TibberHandler) StartStreamStateEventListener() {
 	go func() {
 		for {
 			stateMsg := <-th.stream.StateReportChan()
 			switch stateMsg.State {
-			case StreamStateConnected:
+			case tibber.StreamStateConnected:
 				th.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
-			case StreamStateDisconnected:
+			case tibber.StreamStateDisconnected:
 				th.appLifecycle.SetConnectionState(edgeapp.ConnStateDisconnected)
 			}
 		}
@@ -117,20 +118,32 @@ func (th *TibberHandler) startPolling() {
 	}()
 }
 
-func (th *TibberHandler) routeTibberMessage(msg *StreamMsg) {
+func (th *TibberHandler) routeTibberMessage(msg *tibber.StreamMsg) {
 	log.Debug("New tibber msg")
 	if th.home.ID == msg.HomeID {
 		// Chek if measurement has power reading
 		// Should be enough to only send extended report, but app does not use power from extended report yet.
 		// This is a "fix" for Kamstrup that only sends data every 10 sec
-		if msg.Payload.Data.LiveMeasurement.HasPower() {
-			th.sendMeterReportMsg(msg.HomeID, float64(msg.Payload.Data.LiveMeasurement.Power), "W", nil)
+		if msg.Payload.Data.LiveMeasurement.HasProductionOrConsumptionPower() {
+			watt := calculateSinglePowerValue(msg.Payload.Data.LiveMeasurement)
+			th.sendMeterReportMsg(msg.HomeID, float64(watt), "W", nil)
 		}
 		// Check if this is an extended or normal report
 		if msg.Payload.Data.LiveMeasurement.IsExtended() {
 			th.sendMeterExtendedReportMsg(msg.HomeID, msg.Payload.Data.LiveMeasurement.AsFloatMap(), nil)
 		}
 	}
+}
+
+// calculateSinglePowerValue returns + or - wattage
+func calculateSinglePowerValue(liveData tibber.LiveMeasurement) float64 {
+	var val float64
+	if liveData.Power > 0 {
+		val = liveData.Power
+	} else if liveData.PowerProduction > 0 {
+		val = -liveData.PowerProduction
+	}
+	return val
 }
 
 func (th *TibberHandler) sendSensorReportMsg(addr string, service string, value float64, unit string, oldMsg *fimpgo.FimpMessage) {

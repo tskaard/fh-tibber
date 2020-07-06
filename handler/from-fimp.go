@@ -34,8 +34,7 @@ func NewFimpTibberHandler(transport *fimpgo.MqttTransport, appLifecycle *edgeapp
 	if err == nil && hubInfo != nil {
 		t.env = hubInfo.Environment
 	} else {
-		// TODO: switch to prod
-		t.env = utils.EnvBeta
+		t.env = utils.EnvProd
 	}
 	return t
 }
