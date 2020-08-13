@@ -207,6 +207,31 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				t.mqt.Publish(adr, msg)
 			}
 
+		case "cmd.auth.logout":
+			// exclude device
+			t.thingDelete(newMsg)
+
+			if t.configs.HomeID == "" {
+				// set appLifeCycle values
+				t.appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
+				t.appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
+				t.appLifecycle.SetConnectionState(edgeapp.ConnStateDisconnected)
+				t.appLifecycle.SetAuthState(edgeapp.AuthStateNotAuthenticated)
+
+				// respond to topic with necessary value(s)
+				val := map[string]interface{}{
+					"errors":  nil,
+					"success": true,
+				}
+				msg := fimpgo.NewMessage("evt.pd7.response", "vinculum", fimpgo.VTypeObject, val, nil, nil, newMsg.Payload)
+				if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
+					log.Error("Could not respont to wanted request")
+				}
+				log.Info("Logged out successfully")
+			} else {
+				log.Error("Something went wrong when logging out")
+			}
+
 		case "cmd.config.get_extended_report":
 			msg := fimpgo.NewMessage("evt.config.extended_report", "tibber", fimpgo.VTypeObject, t.configs, nil, nil, newMsg.Payload)
 			if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
