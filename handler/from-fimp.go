@@ -8,6 +8,7 @@ import (
 	"github.com/futurehomeno/fimpgo/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/model"
+	tibber "github.com/tskaard/tibber-golang"
 )
 
 // FimpTibberHandler structure
