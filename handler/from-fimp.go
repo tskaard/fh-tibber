@@ -209,7 +209,12 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 
 		case "cmd.auth.logout":
 			// exclude device
-			t.thingDelete(newMsg)
+			t.tibber.stream.Stop()
+			t.sendExclusionReport(t.tibber.home.ID, newMsg.Payload)
+
+			t.tibber.home = &tibber.Home{}
+			t.configs.HomeID = ""
+			t.configs.SaveToFile()
 
 			if t.configs.HomeID == "" {
 				// set appLifeCycle values
