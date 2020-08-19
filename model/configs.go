@@ -11,6 +11,7 @@ import (
 	"github.com/futurehomeno/fimpgo/edgeapp"
 	"github.com/futurehomeno/fimpgo/utils"
 	log "github.com/sirupsen/logrus"
+	"github.com/tskaard/tibber-golang"
 )
 
 type Configs struct {
@@ -28,6 +29,9 @@ type Configs struct {
 	ConfiguredBy       string `json:"configured_by"`
 	AccessToken        string `json:"access_token"`
 	HomeID             string `json:"home_id"`
+	IncludedHomeID     string
+	Homes              []tibber.Home
+	Household          string `json:"households"`
 }
 
 func NewConfigs(workDir string) *Configs {

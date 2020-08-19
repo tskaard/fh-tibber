@@ -1,14 +1,16 @@
 package handler
 
 import (
+	"fmt"
 	"path/filepath"
+
+	"github.com/tskaard/tibber-golang"
 
 	"github.com/futurehomeno/fimpgo"
 	"github.com/futurehomeno/fimpgo/edgeapp"
 	"github.com/futurehomeno/fimpgo/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/tskaard/fh-tibber/model"
-	tibber "github.com/tskaard/tibber-golang"
 )
 
 // FimpTibberHandler structure
@@ -19,6 +21,7 @@ type FimpTibberHandler struct {
 	appLifecycle *edgeapp.Lifecycle
 	configs      *model.Configs
 	env          string
+	homes        []tibber.Home
 }
 
 // NewFimpTibberHandler construct new handler
@@ -61,16 +64,18 @@ func (t *FimpTibberHandler) Start() error {
 
 func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 	log.WithField("type", newMsg.Payload.Type).Debug("New fimp msg")
+	newTokens := AuthData{}
+	homes := t.homes
 	switch newMsg.Payload.Service {
 	case "sensor_price":
 		switch newMsg.Payload.Type {
 		case "cmd.sensor.get_report":
-			currentPrice, err := t.tibber.client.GetCurrentPrice(t.tibber.home.ID)
+			currentPrice, err := t.tibber.client.GetCurrentPrice(t.configs.IncludedHomeID)
 			if err != nil {
 				log.Error("Cannot get prices from Tibber - ", err)
 				return
 			}
-			t.tibber.sendSensorReportMsg(t.tibber.home.ID, "sensor_price", currentPrice.Total, currentPrice.Currency, newMsg.Payload)
+			t.tibber.sendSensorReportMsg(t.configs.IncludedHomeID, "sensor_price", currentPrice.Total, currentPrice.Currency, newMsg.Payload)
 			log.Debug("sensor_price sent")
 		}
 	case "meter_elec":
@@ -92,7 +97,7 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 
 		case "cmd.auth.set_tokens":
 			log.Info("Configuring tokens")
-			newTokens := AuthData{}
+			// newTokens := AuthData{}
 			err := newMsg.Payload.GetObjectValue(&newTokens)
 			if err != nil {
 				log.Error("Incorrect login message ")
@@ -104,61 +109,83 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				t.tibber.stream.Token = newTokens.AccessToken
 
 				// Getting homes
-				homes, err := t.tibber.client.GetHomes()
+				homes, err = t.tibber.client.GetHomes()
+				t.configs.Homes = homes
 				if err != nil {
 					log.Error("Cannot get homes from Tibber - ", err)
 					t.tibber.client.Token = ""
 					break
 				}
-				for _, home := range homes {
-					log.Debug(home.ID)
-					if home.ID == "" {
-						break
-					}
-					if home.Features.RealTimeConsumptionEnabled {
-						t.configs.HomeID = home.ID
-						t.tibber.stream.ID = home.ID
-						t.tibber.home = &home
-						break
-					}
-				}
-				var status string
-				errStr := ""
-				if t.tibber.stream.ID != "" {
-					//t.tibber.stream.StartSubscription(t.tibber.msgChan)
-					t.tibber.Start(t.tibber.client.Token, t.tibber.stream.ID)
-
-					t.tibber.client.SendPushNotification("Futurehome", t.tibber.home.AppNickname+" is now connected to Futurehome 🎉")
-					t.configs.SaveToFile()
-
-					t.appLifecycle.SetAppState(edgeapp.AppStateRunning, nil)
-					t.appLifecycle.SetConfigState(edgeapp.ConfigStateConfigured)
-					t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+				t.configs.SaveToFile()
+				if len(t.configs.Homes) > 0 {
 					t.appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
-					status = edgeapp.AuthStateAuthenticated
-					// Send inc report
-					t.sendInclusionReport(*t.tibber.home, newMsg.Payload)
 				} else {
-					log.Info("Tokens configuration failed with error : ", err)
-					t.appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
-					t.appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
-					t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
 					t.appLifecycle.SetAuthState(edgeapp.AuthStateNotAuthenticated)
-					status = edgeapp.AuthStateNotAuthenticated
-					if err != nil {
-						t.appLifecycle.SetLastError(err.Error())
-						errStr = err.Error()
+				}
+
+				// this needs to take into account multiple homes?
+				if len(t.configs.Homes) == 1 {
+					for _, home := range homes {
+						log.Debug(home.ID)
+						if home.ID == "" {
+							break
+						}
+						if home.Features.RealTimeConsumptionEnabled {
+							t.configs.HomeID = home.ID
+							t.tibber.stream.ID = home.ID
+							t.tibber.home = &home
+							break
+						}
 					}
-				}
-				val := edgeapp.AuthResponse{
-					Status:    status,
-					ErrorText: errStr,
-					ErrorCode: "",
-				}
-				msg := fimpgo.NewMessage("evt.auth.status_report", "tibber", fimpgo.VTypeObject, val, nil, nil, newMsg.Payload)
-				if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
-					// if response topic is not set , sending back to default application event topic
-					t.mqt.Publish(adr, msg)
+					var status string
+					errStr := ""
+					if t.tibber.stream.ID != "" {
+						//t.tibber.stream.StartSubscription(t.tibber.msgChan)
+						t.tibber.Start(t.tibber.client.Token, t.tibber.stream.ID)
+
+						t.tibber.client.SendPushNotification("Futurehome", t.tibber.home.AppNickname+" is now connected to Futurehome 🎉")
+						t.configs.SaveToFile()
+
+						t.appLifecycle.SetAppState(edgeapp.AppStateRunning, nil)
+						t.appLifecycle.SetConfigState(edgeapp.ConfigStateConfigured)
+						t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+						t.appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
+						status = edgeapp.AuthStateAuthenticated
+						// Send inc report
+						t.sendInclusionReport(*t.tibber.home, newMsg.Payload)
+					} else {
+						log.Info("Tokens configuration failed with error : ", err)
+						t.appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
+						t.appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
+						t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+						t.appLifecycle.SetAuthState(edgeapp.AuthStateNotAuthenticated)
+						status = edgeapp.AuthStateNotAuthenticated
+						if err != nil {
+							t.appLifecycle.SetLastError(err.Error())
+							errStr = err.Error()
+						}
+					}
+					val := edgeapp.AuthResponse{
+						Status:    status,
+						ErrorText: errStr,
+						ErrorCode: "",
+					}
+					msg := fimpgo.NewMessage("evt.auth.status_report", "tibber", fimpgo.VTypeObject, val, nil, nil, newMsg.Payload)
+					if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
+						// if response topic is not set , sending back to default application event topic
+						t.mqt.Publish(adr, msg)
+					}
+				} else {
+					val := edgeapp.AuthResponse{
+						Status:    edgeapp.AuthStateAuthenticated,
+						ErrorText: "",
+						ErrorCode: "",
+					}
+					msg := fimpgo.NewMessage("evt.auth.status_report", "tibber", fimpgo.VTypeObject, val, nil, nil, newMsg.Payload)
+					if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
+						// if response topic is not set , sending back to default application event topic
+						t.mqt.Publish(adr, msg)
+					}
 				}
 			} else {
 				log.Error("Empty tokens , message was skipped")
@@ -193,6 +220,35 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				manifest.Auth.AuthEndpoint = "https://partners.futurehome.io/api/control/edge/proxy/auth-code"
 				manifest.Auth.RedirectURL = "https://app-static.futurehome.io/playground_oauth_callback"
 				manifest.Auth.CodeGrantLoginPageUrl = "https://thewall.tibber.com/connect/authorize?client_id=8nr3zyLa-dF-qIcCtXET0sq9xCxK6EjCKn7jx3A9GY8&redirect_uri=https://app-static.futurehome.io/playground_oauth_callback&response_type=code&scope=tibber_graph"
+			}
+			if len(t.configs.Homes) > 1 {
+				if t.configs.IncludedHomeID != "" {
+					manifest.UIBlocks[0].Hidden = false
+					manifest.Configs[0].ValT = "str_map"
+					manifest.Configs[0].UI.Type = "input_readonly"
+					var val edgeapp.Value
+					val.Default = "Tibber is configured."
+					manifest.Configs[0].Val = val
+				} else {
+					manifest.UIBlocks[0].Hidden = false
+					var householdSelect []interface{}
+					manifest.Configs[0].ValT = "str_map"
+					manifest.Configs[0].UI.Type = "list_radio"
+					for i := 0; i < len(t.configs.Homes); i++ {
+						label := fmt.Sprintf("House with size %d square meters", t.configs.Homes[i].Size)
+						householdSelect = append(householdSelect, map[string]interface{}{"val": t.configs.Homes[i].ID, "label": map[string]interface{}{"en": label}})
+					}
+					manifest.Configs[0].UI.Select = householdSelect
+				}
+			} else if len(t.configs.Homes) == 0 {
+				manifest.UIBlocks[0].Hidden = false
+				manifest.Configs[0].ValT = "string"
+				manifest.Configs[0].UI.Type = "input_readonly"
+				var val edgeapp.Value
+				val.Default = "You need to login first"
+				manifest.Configs[0].Val = val
+			} else {
+				manifest.UIBlocks[0].Hidden = true
 			}
 
 			msg := fimpgo.NewMessage("evt.app.manifest_report", "tibber", fimpgo.VTypeObject, manifest, nil, nil, newMsg.Payload)
@@ -244,6 +300,72 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 				t.mqt.Publish(adr, msg)
 			}
 
+		case "cmd.config.extended_set":
+			conf := model.Configs{}
+			err := newMsg.Payload.GetObjectValue(&conf)
+			if err != nil {
+				log.Error("Can't parse configuration object")
+				return
+			}
+
+			t.configs.IncludedHomeID = conf.Household
+			t.configs.SaveToFile()
+			log.Debugf("App reconfigured. New parameters : %v", t.configs)
+
+			for _, home := range t.configs.Homes {
+				log.Debug(home.ID)
+				if home.ID == t.configs.IncludedHomeID {
+					if home.ID == "" {
+						break
+					}
+					if home.Features.RealTimeConsumptionEnabled {
+						t.configs.HomeID = home.ID
+						t.tibber.stream.ID = home.ID
+						t.tibber.home = &home
+						break
+					}
+				}
+			}
+
+			if t.tibber.stream.ID != "" {
+				t.appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
+				t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+				t.configs.SaveToFile()
+			} else {
+				log.Info("Tokens configuration failed with error : ", err)
+				t.appLifecycle.SetAppState(edgeapp.AppStateNotConfigured, nil)
+				t.appLifecycle.SetConfigState(edgeapp.ConfigStateNotConfigured)
+				t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+				t.appLifecycle.SetAuthState(edgeapp.AuthStateNotAuthenticated)
+				if err != nil {
+					t.appLifecycle.SetLastError(err.Error())
+				}
+			}
+
+			configReport := model.ConfigReport{
+				OpStatus: "ok",
+				AppState: *t.appLifecycle.GetAllStates(),
+			}
+			msg := fimpgo.NewMessage("evt.app.config_report", "tibber", fimpgo.VTypeObject, configReport, nil, nil, newMsg.Payload)
+			if err := t.mqt.RespondToRequest(newMsg.Payload, msg); err != nil {
+				t.mqt.Publish(adr, msg)
+			}
+
+			if t.tibber.stream.ID != "" {
+				//t.tibber.stream.StartSubscription(t.tibber.msgChan)
+				t.tibber.Start(t.tibber.client.Token, t.tibber.stream.ID)
+
+				t.tibber.client.SendPushNotification("Futurehome", t.tibber.home.AppNickname+" is now connected to Futurehome 🎉")
+				t.configs.SaveToFile()
+
+				t.appLifecycle.SetAppState(edgeapp.AppStateRunning, nil)
+				t.appLifecycle.SetConfigState(edgeapp.ConfigStateConfigured)
+				t.appLifecycle.SetConnectionState(edgeapp.ConnStateConnected)
+				t.appLifecycle.SetAuthState(edgeapp.AuthStateAuthenticated)
+				// Send inc report
+				t.sendInclusionReport(*t.tibber.home, newMsg.Payload)
+			}
+
 		case "cmd.system.sync":
 			t.systemSync(newMsg)
 
@@ -255,11 +377,12 @@ func (t *FimpTibberHandler) routeFimpMessage(newMsg *fimpgo.Message) {
 
 		case "cmd.thing.delete":
 			t.thingDelete(newMsg)
+			t.configs.IncludedHomeID = ""
+			t.configs.SaveToFile()
 
 			// case "evt.gateway.factory_reset":
 			// 	t.systemDisconnect(newMsg)
 
 		}
-
 	}
 }

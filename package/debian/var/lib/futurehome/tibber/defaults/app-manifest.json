@@ -1,6 +1,21 @@
 {
   "configs":[
     {
+      "id": "households",
+      "label": {"en": "households"},
+      "val_t": "str_map",
+      "ui": {
+        "type": "list_checkbox",
+        "select": [{}]
+      },
+      "val": {
+        "default": "nothing"
+      },
+      "is_required": true,
+      "hidden":false,
+      "config_point": "any"
+    },
+    {
       "id": "connection_state",
       "label": {"en": "Connection state"},
       "val_t": "string",
@@ -42,6 +57,15 @@
     }
   ],
   "ui_blocks": [
+    {
+      "id": "households",
+      "header": {"en": "Choose household"},
+      "text": {"en": "You can only choose one per site."},
+      "configs": ["households"],
+      "buttons": [],
+      "footer": {"en": ""},
+      "hidden": false
+    },
     {
       "id": "block_1",
       "header": {"en": "Configuration status"},
